@@ -1,74 +1,93 @@
 "use client"
 
-import { Clock, FastForward } from "lucide-react"
-import { motion } from "framer-motion"
-import { handleImageError } from "@/utils/image-utils"
+import { Play } from "lucide-react"
+import { useEffect, useState } from "react"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 
-// Sample data for currently watching
-const CURRENTLY_WATCHING = {
-  title: "The Last of Us",
-  episode: "Season 1, Episode 5",
-  progress: 65,
-  timeLeft: "32 min left",
-  image: "https://image.tmdb.org/t/p/w500/uKvVjHNqB5VmOrdxqAt2F7J78ED.jpg",
-}
+// Sample data
+const CONTINUE_WATCHING = [
+  {
+    id: 1,
+    title: "Oppenheimer",
+    image: "/placeholder.svg?height=200&width=400",
+    progress: 45,
+    remainingMinutes: 98,
+  },
+  {
+    id: 2,
+    title: "Poor Things",
+    image: "/placeholder.svg?height=200&width=400",
+    progress: 30,
+    remainingMinutes: 121,
+  },
+]
 
 export default function WatchProgress() {
+  const [progressValues, setProgressValues] = useState(CONTINUE_WATCHING.map((item) => item.progress))
+
+  // Animate progress bars on component mount
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setProgressValues(CONTINUE_WATCHING.map((item) => item.progress))
+    }, 300)
+
+    return () => clearTimeout(timeout)
+  }, [])
+
   return (
     <Card className="overflow-hidden bg-card/50 backdrop-blur-sm">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <Clock className="size-5 text-[hsl(var(--neon-blue))]" />
+        <CardTitle className="flex items-center justify-between text-lg">
           Continue Watching
+          <Button variant="link" className="text-sm font-normal text-muted-foreground">
+            View All
+          </Button>
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="relative overflow-hidden rounded-lg">
-          <div className="relative aspect-video w-full overflow-hidden rounded-lg">
-            <img
-              src={CURRENTLY_WATCHING.image || "/placeholder.svg"}
-              alt={CURRENTLY_WATCHING.title}
-              className="h-full w-full object-cover"
-              onError={(e) => handleImageError(e)}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+      <CardContent className="grid gap-4">
+        {CONTINUE_WATCHING.map((item, index) => (
+          <div key={item.id} className="group relative overflow-hidden rounded-md">
+            <div className="absolute inset-0 bg-black/50 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
-            <div className="absolute inset-x-0 bottom-0 p-4">
-              <div className="mb-2 flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold text-white">{CURRENTLY_WATCHING.title}</h3>
-                  <p className="text-sm text-gray-300">{CURRENTLY_WATCHING.episode}</p>
-                </div>
-                <span className="text-sm text-gray-300">{CURRENTLY_WATCHING.timeLeft}</span>
-              </div>
-
-              <div className="mb-3">
-                <Progress value={CURRENTLY_WATCHING.progress} className="h-1.5" />
-              </div>
-
-              <div className="flex gap-2">
-                <Button className="flex-1 bg-white text-black hover:bg-white/90">Resume</Button>
-                <Button variant="outline" size="icon" className="border-white/20 text-white hover:bg-white/20">
-                  <FastForward className="size-4" />
+            <div className="relative flex flex-col">
+              <div className="relative h-36 overflow-hidden rounded-md bg-muted">
+                <img
+                  src={item.image || "/placeholder.svg"}
+                  alt={item.title}
+                  className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                />
+                <Button
+                  size="icon"
+                  className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  variant="secondary"
+                >
+                  <Play className="size-5 text-foreground" fill="currentColor" />
                 </Button>
+              </div>
+
+              <div className="mt-2">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-medium">{item.title}</h3>
+                  <span className="text-xs text-muted-foreground">{item.remainingMinutes} min left</span>
+                </div>
+                <Progress
+                  value={progressValues[index]}
+                  className="mt-2 h-1.5 bg-muted"
+                  indicatorClassName="bg-gradient-to-r from-[hsl(var(--neon-blue))] to-[hsl(var(--neon-magenta))]"
+                />
               </div>
             </div>
           </div>
-
-          <motion.div
-            className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 transition-opacity hover:opacity-100"
-            whileHover={{ opacity: 1 }}
-          >
-            <Button size="lg" className="bg-white text-black hover:bg-white/90">
-              Play Now
-            </Button>
-          </motion.div>
-        </div>
+        ))}
       </CardContent>
+      <CardFooter className="border-t border-muted pt-3">
+        <Button variant="ghost" className="w-full text-muted-foreground">
+          Browse Recently Added
+        </Button>
+      </CardFooter>
     </Card>
   )
 }

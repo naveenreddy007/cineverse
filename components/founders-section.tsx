@@ -1,123 +1,163 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { motion } from "framer-motion"
+import { FilmIcon, BookOpen, Star, Tv, Sparkles, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Film, Star, Youtube, Twitter, Instagram, ArrowRight } from "lucide-react"
-import Link from "next/link"
 
 export function FoundersSection() {
-  const [isHovered, setIsHovered] = useState(false)
-
-  // Social media links
-  const socialLinks = [
-    {
-      name: "YouTube",
-      icon: Youtube,
-      url: "https://youtube.com/@siddu",
-      color: "text-red-500 hover:bg-red-500/10",
-    },
-    {
-      name: "Twitter",
-      icon: Twitter,
-      url: "https://twitter.com/siddu",
-      color: "text-blue-400 hover:bg-blue-400/10",
-    },
-    {
-      name: "Instagram",
-      icon: Instagram,
-      url: "https://instagram.com/siddu",
-      color: "text-pink-500 hover:bg-pink-500/10",
-    },
-  ]
+  const [isExpanded, setIsExpanded] = useState(false)
 
   return (
     <section className="py-20 relative overflow-hidden">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 gradient-text cinematic-title">Meet the Founder</h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            SidduVerse was created by a passionate cinephile with a vision to build the ultimate movie community.
-          </p>
-        </div>
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-black/90 to-background z-0"></div>
 
-        <div className="max-w-4xl mx-auto">
-          <Card className="overflow-hidden border-neon-blue/20">
-            <div className="grid grid-cols-1 md:grid-cols-2">
-              <div className="relative aspect-square md:aspect-auto">
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-br from-neon-blue/20 to-neon-magenta/20 z-0"
-                  animate={{
-                    opacity: isHovered ? 0.8 : 0.5,
-                  }}
-                  transition={{ duration: 0.5 }}
-                />
-                <motion.div
-                  className="absolute inset-0 flex items-center justify-center"
-                  onHoverStart={() => setIsHovered(true)}
-                  onHoverEnd={() => setIsHovered(false)}
-                >
-                  <Avatar className="h-40 w-40 border-4 border-white/10">
-                    <AvatarImage src="/placeholder.svg?height=160&width=160&query=film director profile" alt="Siddu" />
-                    <AvatarFallback className="text-4xl">SD</AvatarFallback>
-                  </Avatar>
-                </motion.div>
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="flex flex-col md:flex-row items-center gap-12 mb-16">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7 }}
+            viewport={{ once: true }}
+            className="relative w-full max-w-md aspect-square rounded-full overflow-hidden border-4 border-neon-blue shadow-[0_0_30px_rgba(0,210,255,0.5)]"
+          >
+            <Image src="/placeholder-ypk8u.png" alt="Siddu - Founder of SidduVerse" fill className="object-cover" />
+          </motion.div>
+
+          <div className="flex-1">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+              viewport={{ once: true }}
+            >
+              <Badge className="bg-neon-blue/20 text-neon-blue border-neon-blue/50 px-3 py-1 text-sm mb-4">
+                <Sparkles className="h-4 w-4 mr-2" />
+                The Visionary
+              </Badge>
+
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 gradient-text">Meet Siddu</h2>
+
+              <p className="text-xl text-white/80 mb-6">
+                Siddu isn't just an ordinary movie lover. He's a dedicated cinephile who watches all the best series and
+                loves to share his unique perspective with others.
+              </p>
+
+              <div className="flex flex-wrap gap-6 mb-8">
+                <div className="flex items-center gap-2">
+                  <div className="w-12 h-12 rounded-full bg-neon-blue/20 flex items-center justify-center">
+                    <FilmIcon className="h-6 w-6 text-neon-blue" />
+                  </div>
+                  <div>
+                    <p className="text-3xl font-bold gradient-text">1,500+</p>
+                    <p className="text-sm text-white/60">Movies Watched</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="w-12 h-12 rounded-full bg-neon-magenta/20 flex items-center justify-center">
+                    <Tv className="h-6 w-6 text-neon-magenta" />
+                  </div>
+                  <div>
+                    <p className="text-3xl font-bold gradient-text">200+</p>
+                    <p className="text-sm text-white/60">Series Completed</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="w-12 h-12 rounded-full bg-neon-blue/20 flex items-center justify-center">
+                    <Star className="h-6 w-6 text-neon-blue" />
+                  </div>
+                  <div>
+                    <p className="text-3xl font-bold gradient-text">850+</p>
+                    <p className="text-sm text-white/60">Reviews Written</p>
+                  </div>
+                </div>
               </div>
 
-              <CardContent className="p-8 flex flex-col justify-center">
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className="text-2xl font-bold">Siddu</h3>
-                  <Badge className="bg-neon-blue/20 text-neon-blue">Founder & Curator</Badge>
-                </div>
+              <blockquote className="border-l-4 border-neon-blue pl-4 mb-6 italic text-white/80">
+                "If a picture is worth a thousand words, then a movie is worth a million. Films can make you happy, sad,
+                reflective, educated, and inspired all within a couple of hours."
+              </blockquote>
 
-                <p className="text-muted-foreground mb-4">
-                  Filmmaker, critic, and lifelong cinephile with over 15 years of experience in the film industry.
-                </p>
-
-                <div className="space-y-4 mb-6">
-                  <p>
-                    "I created SidduVerse to share my passion for cinema and build a community where every film
-                    enthusiast can discover, discuss, and celebrate the art of storytelling through film."
-                  </p>
-
-                  <div className="flex flex-wrap gap-3">
-                    <div className="flex items-center text-sm">
-                      <Film className="h-4 w-4 mr-1 text-neon-blue" />
-                      <span>500+ Films Reviewed</span>
-                    </div>
-                    <div className="flex items-center text-sm">
-                      <Star className="h-4 w-4 mr-1 text-yellow-400 fill-yellow-400" />
-                      <span>Award-Winning Critic</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="flex gap-2">
-                    {socialLinks.map((link) => (
-                      <Link key={link.name} href={link.url} target="_blank" rel="noopener noreferrer">
-                        <Button variant="ghost" size="icon" className={`rounded-full ${link.color}`}>
-                          <link.icon className="h-4 w-4" />
-                          <span className="sr-only">{link.name}</span>
-                        </Button>
-                      </Link>
-                    ))}
-                  </div>
-
-                  <Link href="/about-siddu">
-                    <Button className="ml-auto group">
-                      Learn More
-                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </div>
-          </Card>
+              <Button
+                className="bg-neon-blue text-black hover:bg-neon-blue/80 group"
+                onClick={() => setIsExpanded(!isExpanded)}
+              >
+                {isExpanded ? "Read Less" : "Read More"}
+                <ArrowRight
+                  className={`ml-2 h-4 w-4 transition-transform duration-300 ${isExpanded ? "rotate-90" : "group-hover:translate-x-1"}`}
+                />
+              </Button>
+            </motion.div>
+          </div>
         </div>
+
+        {isExpanded && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.5 }}
+            className="glass-card rounded-2xl p-8 border border-white/10 mb-16"
+          >
+            <h3 className="text-2xl font-bold mb-6 gradient-text">Siddu's Movie Philosophy</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+              <div>
+                <blockquote className="text-xl text-white/80 italic mb-4">
+                  "Movies aren't just entertainment – they're time machines, empathy builders, and windows into other
+                  worlds. Choose what you watch wisely, because every film leaves an imprint on your soul."
+                </blockquote>
+
+                <p className="text-white/70">
+                  This philosophy became the foundation of SidduVerse - a platform that treats films as meaningful
+                  experiences rather than just casual entertainment.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="text-lg font-semibold mb-3 text-neon-magenta">Currently exploring:</h4>
+                <p className="text-white/80 mb-4">The New Wave cinema of the 1960s</p>
+
+                <h4 className="text-lg font-semibold mb-3 text-neon-blue">Favorite genres:</h4>
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {["Drama", "Sci-Fi", "Psychological Thriller", "Neo-noir", "Documentaries"].map((genre) => (
+                    <Badge key={genre} className="bg-white/10 hover:bg-white/20">
+                      {genre}
+                    </Badge>
+                  ))}
+                </div>
+
+                <h4 className="text-lg font-semibold mb-3 text-neon-magenta">Top directors:</h4>
+                <p className="text-white/80">
+                  Christopher Nolan, Denis Villeneuve, Wong Kar-wai, Bong Joon-ho, David Fincher
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-black/40 backdrop-blur-sm border border-neon-blue/30 rounded-lg p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <BookOpen className="h-5 w-5 text-neon-blue" />
+                <h4 className="text-lg font-semibold text-neon-blue">The Birth of SidduVerse</h4>
+              </div>
+
+              <p className="text-white/80 mb-4">
+                SidduVerse began as a personal project to catalog Siddu's vast collection of movie experiences and share
+                them with friends. As more people discovered his unique perspectives and insightful recommendations, the
+                idea evolved into a comprehensive platform for cinephiles everywhere.
+              </p>
+
+              <p className="text-white/80">
+                What sets SidduVerse apart is its authenticity. Every feature – from the dual rating system that reveals
+                the truth behind reviews to the challenging movie quizzes – is designed to deepen your appreciation of
+                cinema and connect you with fellow enthusiasts who share Siddu's passion for the art form.
+              </p>
+            </div>
+          </motion.div>
+        )}
       </div>
     </section>
   )
