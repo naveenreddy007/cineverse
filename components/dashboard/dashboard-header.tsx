@@ -1,44 +1,70 @@
 "use client"
 
-import Link from "next/link"
-import { Bell, Search } from "lucide-react"
+import { Bell, Film, Search, Settings, User } from "lucide-react"
+import { useState } from "react"
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 export default function DashboardHeader() {
-  return (
-    <div className="flex items-center justify-between">
-      <div>
-        <h1 className="text-3xl font-bold gradient-text">Welcome to SidduVerse</h1>
-        <p className="text-muted-foreground">Your personal movie dashboard</p>
-      </div>
+  const [searchQuery, setSearchQuery] = useState("")
 
-      <div className="flex items-center gap-4">
-        <div className="relative hidden md:flex items-center">
-          <Search className="absolute left-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search movies..."
-            className="pl-8 bg-background/60 border-border/50 w-[200px] lg:w-[300px]"
-          />
+  return (
+    <header className="mx-auto flex max-w-7xl flex-col gap-6">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <Film className="size-8 text-[hsl(var(--neon-magenta))]" />
+          <h1 className="text-2xl font-bold tracking-tight">CineVerse</h1>
         </div>
 
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-neon-blue text-black">
-            3
-          </Badge>
-        </Button>
+        <div className="ml-auto mr-4 flex flex-1 max-w-md relative">
+          <div className="group relative flex w-full items-center">
+            <Search className="absolute left-3 size-4 text-muted-foreground" />
+            <Input
+              type="search"
+              placeholder="Search for movies, shows, or directors..."
+              className="w-full bg-background/50 pl-10 pr-4 backdrop-blur-sm transition-all focus-visible:bg-background/80 border-muted"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
 
-        <Link href="/dashboard/profile">
-          <Avatar>
-            <AvatarImage src="https://i.pravatar.cc/150?img=7" alt="User" />
-            <AvatarFallback>SD</AvatarFallback>
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" className="relative">
+            <Bell className="size-5" />
+            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[hsl(var(--neon-magenta))]"></span>
+          </Button>
+          <Button variant="ghost" size="icon">
+            <Settings className="size-5" />
+          </Button>
+          <Avatar className="h-9 w-9 border-2 border-primary/10">
+            <AvatarImage src="/placeholder.svg?height=36&width=36" alt="User" />
+            <AvatarFallback>
+              <User className="size-4" />
+            </AvatarFallback>
           </Avatar>
-        </Link>
+        </div>
       </div>
-    </div>
+
+      <div className="flex items-center justify-between border-b border-muted pb-2">
+        <nav className="flex gap-6">
+          {["Overview", "Watchlist", "Collections", "Reviews"].map((item) => (
+            <Button
+              key={item}
+              variant="link"
+              className={item === "Overview" ? "text-[hsl(var(--neon-blue))] font-medium" : "text-muted-foreground"}
+            >
+              {item}
+            </Button>
+          ))}
+        </nav>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-muted-foreground">Last updated:</span>
+          <span className="text-sm">Just now</span>
+        </div>
+      </div>
+    </header>
   )
 }

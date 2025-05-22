@@ -2,7 +2,6 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { MobileLayout } from "@/components/mobile-layout"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/components/auth-provider"
@@ -10,8 +9,8 @@ import { AuthProvider } from "@/components/auth-provider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "SidduVerse - The Ultimate Movie Experience",
-  description: "A platform for cinephiles created by a true movie lover",
+  title: "CineVerse - Movie Lovers Dashboard",
+  description: "The ultimate dashboard for movie enthusiasts",
     generator: 'v0.dev'
 }
 
@@ -25,7 +24,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-            <MobileLayout hideFooterNav={false}>{children}</MobileLayout>
+            {children}
             <Toaster />
           </ThemeProvider>
         </AuthProvider>
