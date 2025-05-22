@@ -436,4 +436,3 @@ export function ReviewsClient({ initialReviews = [], initialDrafts = [], error }
     </div>
   )
 }
-

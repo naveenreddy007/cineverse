@@ -29,4 +29,3 @@ export default function ProblematicComponent2() {
     </div>
   )
 }
-

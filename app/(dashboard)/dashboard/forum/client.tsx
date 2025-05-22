@@ -545,4 +545,3 @@ export function ForumClient({ initialPosts = [] }: ForumClientProps) {
     </div>
   )
 }
-

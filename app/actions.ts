@@ -13,4 +13,3 @@ export async function getUserProfile(userId: string) {
 
   return data
 }
-

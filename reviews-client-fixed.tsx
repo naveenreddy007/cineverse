@@ -432,4 +432,3 @@ export function ReviewsClient({ initialReviews, initialDrafts, error }: ReviewsC
     </div>
   )
 }
-

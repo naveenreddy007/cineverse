@@ -153,4 +153,3 @@ export async function updateWatchlistPriority(watchlistId: string, priority: "lo
 
   return { data, error }
 }
-

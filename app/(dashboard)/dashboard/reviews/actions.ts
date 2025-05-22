@@ -95,4 +95,3 @@ export async function updateReview(
 
   return { data, error }
 }
-

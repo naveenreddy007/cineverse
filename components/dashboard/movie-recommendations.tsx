@@ -11,7 +11,7 @@ const MOVIE_RECOMMENDATIONS = [
   {
     id: 1,
     title: "Everything Everywhere All at Once",
-    image: "https://image.tmdb.org/t/p/w500/w3LxiVYdWWRvEVdn5RYq6jIqkb1.jpg",
+    image: "/placeholder.svg?height=200&width=350",
     rating: 4.7,
     year: 2022,
     liked: false,
@@ -20,7 +20,7 @@ const MOVIE_RECOMMENDATIONS = [
   {
     id: 2,
     title: "The Farewell",
-    image: "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
+    image: "/placeholder.svg?height=200&width=350",
     rating: 4.2,
     year: 2019,
     liked: true,
@@ -29,7 +29,7 @@ const MOVIE_RECOMMENDATIONS = [
   {
     id: 3,
     title: "Parasite",
-    image: "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
+    image: "/placeholder.svg?height=200&width=350",
     rating: 4.6,
     year: 2019,
     liked: false,
@@ -84,14 +84,7 @@ export default function MovieRecommendations() {
               }}
             >
               <div className="relative h-full w-full overflow-hidden rounded-md">
-                <img
-                  src={movie.image || "/placeholder.svg"}
-                  alt={movie.title}
-                  className="h-full w-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = "/placeholder.svg"
-                  }}
-                />
+                <img src={movie.image || "/placeholder.svg"} alt={movie.title} className="h-full w-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
                 <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -145,4 +138,3 @@ export default function MovieRecommendations() {
     </Card>
   )
 }
-

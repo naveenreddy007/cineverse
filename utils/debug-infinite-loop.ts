@@ -12,4 +12,3 @@ export function debugRender(componentName: string, dependencies: Record<string, 
     })
   }
 }
-

@@ -692,4 +692,3 @@ export default function TopicDetailPage() {
     </div>
   )
 }
-

@@ -277,4 +277,3 @@ CREATE POLICY "Users can update their own streaming services"
 CREATE POLICY "Users can disconnect their own streaming services" 
   ON public.user_streaming_services FOR DELETE 
   USING (auth.uid() = user_id);
-

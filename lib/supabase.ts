@@ -177,4 +177,3 @@ class SupabaseClient {
 const supabaseClient = new SupabaseClient()
 
 export default supabaseClient
-

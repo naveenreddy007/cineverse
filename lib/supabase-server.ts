@@ -11,4 +11,3 @@ export function getSupabaseServer() {
 export function getSupabaseAction() {
   return createServerActionClient<Database>({ cookies })
 }
-

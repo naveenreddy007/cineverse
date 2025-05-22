@@ -31,4 +31,3 @@ export default function FixedComponent2() {
     </div>
   )
 }
-

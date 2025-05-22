@@ -1,76 +1,51 @@
 "use client"
 
-import { BarChart3 } from "lucide-react"
-import { motion } from "framer-motion"
+import { useEffect, useState } from "react"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
 
-// Sample data for top genres
+// Sample data
 const TOP_GENRES = [
-  {
-    name: "Sci-Fi",
-    count: 42,
-    percentage: 85,
-    color: "bg-[hsl(var(--neon-blue))]",
-  },
-  {
-    name: "Drama",
-    count: 38,
-    percentage: 76,
-    color: "bg-[hsl(var(--neon-magenta))]",
-  },
-  {
-    name: "Thriller",
-    count: 31,
-    percentage: 62,
-    color: "bg-[hsl(var(--neon-green))]",
-  },
-  {
-    name: "Comedy",
-    count: 27,
-    percentage: 54,
-    color: "bg-[hsl(var(--neon-yellow))]",
-  },
-  {
-    name: "Action",
-    count: 24,
-    percentage: 48,
-    color: "bg-[hsl(var(--neon-orange))]",
-  },
+  { name: "Sci-Fi", percentage: 30, color: "from-[hsl(var(--neon-blue))] to-blue-500" },
+  { name: "Drama", percentage: 25, color: "from-[hsl(var(--neon-magenta))] to-purple-500" },
+  { name: "Thriller", percentage: 20, color: "from-green-500 to-emerald-500" },
+  { name: "Comedy", percentage: 15, color: "from-yellow-500 to-amber-500" },
+  { name: "Action", percentage: 10, color: "from-red-500 to-orange-500" },
 ]
 
 export default function TopGenres() {
+  const [loadingProgress, setLoadingProgress] = useState<number[]>(TOP_GENRES.map(() => 0))
+
+  useEffect(() => {
+    // Animate bars on component mount
+    const timeout = setTimeout(() => {
+      setLoadingProgress(TOP_GENRES.map((genre) => genre.percentage))
+    }, 300)
+
+    return () => clearTimeout(timeout)
+  }, [])
+
   return (
     <Card className="overflow-hidden bg-card/50 backdrop-blur-sm">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <BarChart3 className="size-5 text-[hsl(var(--neon-green))]" />
-          Your Top Genres
-        </CardTitle>
+        <CardTitle className="text-lg">Your Top Genres</CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {TOP_GENRES.map((genre, index) => (
-            <motion.div
-              key={genre.name}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1, duration: 0.3 }}
-            >
-              <div className="mb-1 flex items-center justify-between">
-                <span className="text-sm font-medium">{genre.name}</span>
-                <span className="text-xs text-muted-foreground">{genre.count} movies</span>
-              </div>
-              <div className="flex items-center gap-3">
-                <Progress value={genre.percentage} className={`h-2 ${genre.color}`} />
-                <span className="text-xs font-medium">{genre.percentage}%</span>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+      <CardContent className="grid gap-4">
+        {TOP_GENRES.map((genre, index) => (
+          <div key={genre.name} className="space-y-1">
+            <div className="flex items-center justify-between text-sm">
+              <span>{genre.name}</span>
+              <span className="font-mono text-xs font-medium">{genre.percentage}%</span>
+            </div>
+            <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+              <div
+                className={`h-full rounded-full bg-gradient-to-r ${genre.color} transition-all duration-1000 ease-out`}
+                style={{ width: `${loadingProgress[index]}%` }}
+              />
+            </div>
+          </div>
+        ))}
       </CardContent>
     </Card>
   )
 }
-

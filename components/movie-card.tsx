@@ -106,4 +106,3 @@ export function MovieCard({ movie, actions, badge }: MovieCardProps) {
     </motion.div>
   )
 }
-

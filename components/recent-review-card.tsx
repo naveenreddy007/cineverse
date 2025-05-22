@@ -130,4 +130,3 @@ function Star({ filled, halfFilled }: { filled: boolean; halfFilled?: boolean })
     </svg>
   )
 }
-

@@ -416,4 +416,3 @@ export function WatchlistClient({ initialWatchlist = [], error }: WatchlistClien
     </div>
   )
 }
-

@@ -1042,4 +1042,3 @@ export default function RecommendationsPage() {
     </div>
   )
 }
-

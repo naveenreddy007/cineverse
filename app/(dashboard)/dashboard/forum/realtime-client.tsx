@@ -116,4 +116,3 @@ export function RealtimeForumClient({ initialPosts }: RealtimeForumClientProps) 
 
   return <ForumClient initialPosts={posts} />
 }
-

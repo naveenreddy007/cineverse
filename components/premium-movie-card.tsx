@@ -145,4 +145,3 @@ export function PremiumMovieCard({ movie }: PremiumMovieCardProps) {
     </motion.div>
   )
 }
-

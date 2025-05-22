@@ -105,4 +105,3 @@ export function MovieTicket3D({ title, date, time, seat, className = "" }: Movie
     </div>
   )
 }
-

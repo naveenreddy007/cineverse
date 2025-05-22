@@ -50,4 +50,3 @@ export function TrendingTopicCard({ topic }: TrendingTopicCardProps) {
     </Link>
   )
 }
-
