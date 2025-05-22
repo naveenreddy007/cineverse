@@ -1,10 +1,10 @@
 "use client"
 
-import Link from "next/link"
 import { usePathname } from "next/navigation"
+import Link from "next/link"
 import { motion } from "framer-motion"
+import { Home, Search, Film, Heart, User } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Home, Search, Film, MessageSquare, User } from "lucide-react"
 import { useHaptic } from "@/hooks/use-haptic"
 
 export function MobileFooterNav() {
@@ -13,40 +13,39 @@ export function MobileFooterNav() {
 
   const navItems = [
     {
-      href: "/dashboard",
+      name: "Home",
+      href: "/",
       icon: Home,
-      label: "Home",
-      active: pathname === "/dashboard",
     },
     {
-      href: "/dashboard/discover",
+      name: "Discover",
+      href: "/discover",
       icon: Search,
-      label: "Discover",
-      active: pathname === "/dashboard/discover",
     },
     {
-      href: "/dashboard/watchlist",
+      name: "Movies",
+      href: "/movies",
       icon: Film,
-      label: "Watchlist",
-      active: pathname === "/dashboard/watchlist",
     },
     {
-      href: "/dashboard/forum",
-      icon: MessageSquare,
-      label: "Forum",
-      active: pathname.includes("/dashboard/forum"),
+      name: "Watchlist",
+      href: "/dashboard/watchlist",
+      icon: Heart,
     },
     {
-      href: "/dashboard/profile",
+      name: "Profile",
+      href: "/profile",
       icon: User,
-      label: "Profile",
-      active: pathname === "/dashboard/profile",
     },
   ]
 
+  const handleNavClick = () => {
+    trigger(patterns.light)
+  }
+
   return (
     <motion.div
-      className="fixed bottom-0 left-0 right-0 z-50 md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-40 md:hidden"
       initial={{ y: 100 }}
       animate={{ y: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -54,39 +53,37 @@ export function MobileFooterNav() {
       {/* Blurred background effect */}
       <div className="absolute inset-0 bg-black/70 backdrop-blur-md border-t border-white/10" />
 
-      {/* Tab bar */}
-      <div className="relative flex justify-around items-center h-16">
-        {navItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className="relative flex flex-col items-center justify-center w-full h-full"
-            onClick={() => trigger(patterns.tabSwitch)}
-          >
-            {/* Active indicator */}
-            {item.active && (
-              <motion.div
-                layoutId="activeTab"
-                className="absolute top-0 left-0 right-0 mx-auto w-12 h-1 bg-neon-blue rounded-full"
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              />
-            )}
+      {/* Navigation content */}
+      <nav className="relative grid grid-cols-5 h-16">
+        {navItems.map((item) => {
+          const isActive = pathname === item.href || pathname?.startsWith(item.href + "/")
 
-            <motion.div
-              whileTap={{ scale: 0.9 }}
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
               className={cn(
-                "flex flex-col items-center justify-center",
-                item.active ? "text-neon-blue" : "text-gray-400 hover:text-gray-200",
+                "flex flex-col items-center justify-center gap-1 transition-colors",
+                isActive ? "text-neon-blue" : "text-muted-foreground hover:text-foreground",
               )}
+              onClick={handleNavClick}
             >
-              <item.icon className={cn("h-5 w-5 mb-1 transition-all duration-200", item.active && "text-neon-blue")} />
-              <span className={cn("text-xs transition-all duration-200", item.active ? "font-medium" : "font-normal")}>
-                {item.label}
-              </span>
-            </motion.div>
-          </Link>
-        ))}
-      </div>
+              <item.icon className={cn("h-5 w-5", isActive && "fill-neon-blue/20")} />
+              <span className="text-[10px]">{item.name}</span>
+              {isActive && (
+                <motion.div
+                  className="absolute top-0 h-1 w-8 bg-neon-blue rounded-full"
+                  layoutId="activeTab"
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+            </Link>
+          )
+        })}
+      </nav>
+
+      {/* Safe area spacer for iOS devices */}
+      <div className="h-safe-area bg-black/70 backdrop-blur-md" />
     </motion.div>
   )
 }

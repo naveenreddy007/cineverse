@@ -9,9 +9,9 @@ import { AuthProvider } from "@/components/auth-provider"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "CineVerse - Movie Lovers Dashboard",
-  description: "The ultimate dashboard for movie enthusiasts",
-    generator: 'v0.dev'
+  title: "SidduVerse - The Ultimate Movie Experience",
+  description: "A platform for cinephiles created by a true movie lover",
+  generator: "v0.dev",
 }
 
 export default function RootLayout({

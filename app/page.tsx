@@ -12,6 +12,9 @@ import {
   TrendingUp,
   ChevronRight,
   ArrowRight,
+  Youtube,
+  Twitter,
+  Instagram,
 } from "lucide-react"
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import { useRef, useState, useEffect } from "react"
@@ -22,6 +25,7 @@ import { ParticleBackground } from "@/components/particle-background"
 import { PremiumMovieCard } from "@/components/premium-movie-card"
 import { FilmReel } from "@/components/film-reel"
 import { HeroVideoBackground } from "@/components/hero-video-background"
+import { FoundersSection } from "@/components/founders-section"
 
 // Mock data for the interactive showcase
 const featuredMovies = [
@@ -54,7 +58,8 @@ const testimonials = [
     name: "Sarah Chen",
     avatar: "https://i.pravatar.cc/150?img=5",
     role: "Film Enthusiast",
-    content: "CineVerse has completely transformed how I discover and discuss movies. The recommendations are spot-on!",
+    content:
+      "SidduVerse has completely transformed how I discover and discuss movies. The recommendations are spot-on!",
   },
   {
     name: "Michael Rodriguez",
@@ -118,7 +123,7 @@ export default function Home() {
             className="flex items-center gap-2"
           >
             <FilmIcon className="h-8 w-8 text-neon-blue" />
-            <span className="text-2xl font-bold tracking-tight gradient-text">CineVerse</span>
+            <span className="text-2xl font-bold tracking-tight gradient-text">SidduVerse</span>
           </motion.div>
 
           <motion.div
@@ -157,12 +162,12 @@ export default function Home() {
                 <div className="flex justify-center mb-6">
                   <Badge className="bg-neon-blue/20 text-neon-blue border-neon-blue/50 px-3 py-1 text-sm">
                     <Sparkles className="h-4 w-4 mr-2" />
-                    Powered by AI
+                    Created by a True Cinephile
                   </Badge>
                 </div>
                 <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
                   Discover, review, and discuss your favorite films with a community of movie enthusiasts. Get
-                  personalized recommendations and insights.
+                  personalized recommendations and insights from Siddu's curated collection.
                 </p>
               </motion.div>
 
@@ -256,7 +261,7 @@ export default function Home() {
                 Experience Cinema Like Never Before
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Our platform combines cutting-edge technology with your passion for cinema.
+                Our platform combines Siddu's passion for cinema with cutting-edge technology.
               </p>
             </motion.div>
 
@@ -275,7 +280,7 @@ export default function Home() {
               className="glass-card rounded-2xl p-8 border border-white/10 mb-16"
             >
               <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center gradient-text cinematic-title">
-                How CineVerse Works
+                How SidduVerse Works
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -307,6 +312,9 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Founder's Section */}
+        <FoundersSection />
+
         {/* Testimonials Section - Cinematic Carousel */}
         <section className="py-20 bg-black/30 relative overflow-hidden">
           <div className="container mx-auto px-4">
@@ -315,7 +323,7 @@ export default function Home() {
                 What Our Community Says
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Join thousands of movie lovers who've found their film community.
+                Join thousands of movie lovers who've found their film community on SidduVerse.
               </p>
             </div>
 
@@ -334,7 +342,7 @@ export default function Home() {
                       >
                         <div className="flex-shrink-0">
                           <Avatar className="h-20 w-20 border-2 border-neon-blue">
-                            <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
+                            <AvatarImage src={testimonial.avatar || "/placeholder.svg"} alt={testimonial.name} />
                             <AvatarFallback>{testimonial.name[0]}</AvatarFallback>
                           </Avatar>
                         </div>
@@ -424,7 +432,7 @@ export default function Home() {
 
                 <h3 className="text-2xl font-bold mb-4 gradient-text">Seamless Experience</h3>
                 <p className="text-muted-foreground mb-6">
-                  From discovering new films to discussing them with friends, CineVerse provides a complete movie
+                  From discovering new films to discussing them with friends, SidduVerse provides a complete movie
                   lover's experience.
                 </p>
 
@@ -472,7 +480,7 @@ export default function Home() {
                 Ready to Elevate Your Movie Experience?
               </h2>
               <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                Join CineVerse today and become part of a community that's passionate about cinema. Discover new
+                Join SidduVerse today and become part of a community that's passionate about cinema. Discover new
                 favorites and share your thoughts with fellow enthusiasts.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -503,9 +511,30 @@ export default function Home() {
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2">
             <FilmIcon className="h-6 w-6 text-neon-blue" />
-            <span className="text-xl font-bold tracking-tight gradient-text">CineVerse</span>
+            <span className="text-xl font-bold tracking-tight gradient-text">SidduVerse</span>
           </div>
-          <p className="text-muted-foreground text-sm">© 2023 CineVerse. All rights reserved.</p>
+          <div className="flex items-center gap-4">
+            {/* Social Media Links */}
+            <Link href="https://youtube.com/@siddu" target="_blank" rel="noopener noreferrer">
+              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-red-500 hover:bg-red-500/10">
+                <Youtube className="h-4 w-4" />
+                <span className="sr-only">YouTube</span>
+              </Button>
+            </Link>
+            <Link href="https://twitter.com/siddu" target="_blank" rel="noopener noreferrer">
+              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-blue-400 hover:bg-blue-400/10">
+                <Twitter className="h-4 w-4" />
+                <span className="sr-only">Twitter</span>
+              </Button>
+            </Link>
+            <Link href="https://instagram.com/siddu" target="_blank" rel="noopener noreferrer">
+              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-pink-500 hover:bg-pink-500/10">
+                <Instagram className="h-4 w-4" />
+                <span className="sr-only">Instagram</span>
+              </Button>
+            </Link>
+          </div>
+          <p className="text-muted-foreground text-sm">© 2023 SidduVerse. All rights reserved.</p>
           <div className="flex gap-6">
             <Link
               href="#"
@@ -520,10 +549,10 @@ export default function Home() {
               Privacy
             </Link>
             <Link
-              href="#"
+              href="/about-siddu"
               className="text-muted-foreground hover:text-neon-blue text-sm transition-colors animated-underline"
             >
-              Contact
+              About Siddu
             </Link>
           </div>
         </div>

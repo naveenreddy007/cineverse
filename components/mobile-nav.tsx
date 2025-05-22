@@ -61,7 +61,7 @@ export function MobileNav() {
               <div className="absolute h-full w-full rounded-full bg-primary/40"></div>
               <Film className="absolute h-full w-full text-primary-foreground" />
             </div>
-            <span className="text-lg font-bold tracking-tight">CineVerse</span>
+            <span className="text-lg font-bold tracking-tight">SidduVerse</span>
           </Link>
           <div className="ml-auto">
             <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
