@@ -76,7 +76,7 @@ export function FeaturedMovie({
       </div>
 
       {/* Content Overlay */}
-      <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-8 overflow-y-auto scrollbar-thin scrollbar-thumb-neon-blue/50 scrollbar-track-black/20">
+      <div className="absolute inset-0 flex flex-col justify-end p-4 md:p-8 overflow-hidden">
         <div className="flex flex-col md:flex-row gap-6 items-start md:items-center">
           {/* Poster */}
           <motion.div
@@ -88,7 +88,7 @@ export function FeaturedMovie({
           </motion.div>
 
           {/* Details */}
-          <div className="flex-1">
+          <div className="flex-1 space-y-2 md:space-y-3">
             <div className="flex items-center gap-3 mb-2">
               <Badge className={`${badgeVariants[featuredType]} px-3 py-1`}>
                 {iconVariants[featuredType]}
@@ -100,7 +100,7 @@ export function FeaturedMovie({
               </div>
             </div>
 
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-1">{title}</h2>
+            <h2 className="text-xl md:text-3xl font-bold text-white mb-1 line-clamp-2">{title}</h2>
 
             <div className="flex items-center gap-4 text-sm text-white/70 mb-3">
               <span>{year}</span>
@@ -139,7 +139,7 @@ export function FeaturedMovie({
               </p>
             </div>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <Link href={`/movies/${id}`}>
                 <Button className="bg-neon-blue text-black hover:bg-neon-blue/80">
                   <Play className="h-4 w-4 mr-2" />

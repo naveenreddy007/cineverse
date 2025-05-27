@@ -1,10 +1,9 @@
 "use client"
 
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import { ArrowLeft, Bell, MoreVertical } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
 import { useHaptic } from "@/hooks/use-haptic"
 
 interface MobileAppBarProps {
@@ -64,23 +63,28 @@ export function MobileAppBar({
       <div className="relative flex items-center justify-between h-14 px-4">
         <div className="flex items-center">
           {showBack && (
-            <Button variant="ghost" size="icon" className="h-8 w-8 mr-2 rounded-full" onClick={handleBack}>
+            <Button variant="ghost" size="icon" className="h-10 w-10 mr-2 rounded-full" onClick={handleBack}>
               <ArrowLeft className="h-5 w-5" />
             </Button>
           )}
-          <h1 className="text-lg font-bold truncate">{pageTitle}</h1>
+          <h1 className="text-lg font-bold truncate max-w-[200px]">{pageTitle}</h1>
         </div>
 
         <div className="flex items-center gap-2">
           {showNotifications && (
-            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full relative" onClick={handleNotifications}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-10 w-10 rounded-full relative"
+              onClick={handleNotifications}
+            >
               <Bell className="h-5 w-5" />
               <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full" />
             </Button>
           )}
 
           {showMenu && (
-            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full" onClick={handleMenu}>
+            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full" onClick={handleMenu}>
               <MoreVertical className="h-5 w-5" />
             </Button>
           )}
@@ -95,8 +99,11 @@ function getPageTitle(pathname: string): string {
   if (pathname === "/dashboard") return "Home"
   if (pathname === "/dashboard/discover") return "Discover"
   if (pathname === "/dashboard/watchlist") return "Watchlist"
-  if (pathname.includes("/dashboard/forum")) return "Forum"
-  if (pathname === "/dashboard/profile") return "Profile"
+  if (pathname === "/dashboard/reviews") return "Reviews"
+  if (pathname === "/dashboard/forum") return "Forum"
+  if (pathname === "/profile") return "Profile"
+  if (pathname.includes("/movies/")) return "Movie Details"
+  if (pathname.includes("/featured/")) return "Featured Movie"
 
   // Extract the last segment of the path
   const segments = pathname.split("/")

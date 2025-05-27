@@ -2,14 +2,15 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Star, Heart, Clock, ImageOff } from "lucide-react"
+import { Star, Heart, Clock } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useMobile } from "@/hooks/use-mobile"
 import { useHaptic } from "@/hooks/use-haptic"
+import { Film } from "lucide-react" // Import Film component
 
 interface MovieCardMobileProps {
   id: string
@@ -22,6 +23,7 @@ interface MovieCardMobileProps {
   className?: string
   isFavorite?: boolean
   onToggleFavorite?: (id: string) => void
+  linkPrefix?: string
 }
 
 export function MovieCardMobile({
@@ -35,46 +37,49 @@ export function MovieCardMobile({
   className,
   isFavorite = false,
   onToggleFavorite,
+  linkPrefix,
 }: MovieCardMobileProps) {
   const [isPressed, setIsPressed] = useState(false)
   const [imageError, setImageError] = useState(false)
-  const { isMobile, isTouch } = useMobile()
+  const { isMobile } = useMobile()
   const { trigger, patterns } = useHaptic()
-  const [longPressTimer, setLongPressTimer] = useState<NodeJS.Timeout | null>(null)
 
   // Handle long press for mobile devices
-  const handleTouchStart = () => {
-    if (!isTouch || !onToggleFavorite) return
+  const handleTouchStart = useCallback(() => {
+    if (!isMobile || !onToggleFavorite) return
 
     const timer = setTimeout(() => {
       setIsPressed(true)
+      trigger(patterns.medium)
       onToggleFavorite(id)
-      trigger(patterns.success)
     }, 500)
 
-    setLongPressTimer(timer)
-  }
+    return () => clearTimeout(timer)
+  }, [isMobile, onToggleFavorite, id, trigger, patterns.medium])
 
-  const handleTouchEnd = () => {
-    if (longPressTimer) {
-      clearTimeout(longPressTimer)
-      setLongPressTimer(null)
-    }
+  const handleTouchEnd = useCallback(() => {
     setIsPressed(false)
-  }
+  }, [])
 
-  const handleFavoriteClick = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (onToggleFavorite) {
-      onToggleFavorite(id)
-      trigger(isFavorite ? patterns.light : patterns.success)
-    }
-  }
+  const handleFavoriteToggle = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      if (onToggleFavorite) {
+        trigger(patterns.light)
+        onToggleFavorite(id)
+      }
+    },
+    [onToggleFavorite, id, trigger, patterns.light],
+  )
+
+  const handleImageError = useCallback(() => {
+    setImageError(true)
+  }, [])
 
   return (
     <div className={cn("relative group", className)}>
-      <Link href={`/movies/${id}`}>
+      <Link href={`${linkPrefix || "/movies"}/${id}`}>
         <motion.div
           className="relative rounded-lg overflow-hidden aspect-[2/3] bg-muted"
           whileTap={{ scale: 0.95 }}
@@ -83,18 +88,19 @@ export function MovieCardMobile({
           onTouchCancel={handleTouchEnd}
         >
           {imageError ? (
-            <div className="w-full h-full bg-black/60 flex items-center justify-center">
-              <ImageOff className="h-10 w-10 text-muted-foreground" />
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+              <Film className="h-8 w-8 text-muted-foreground" />
             </div>
           ) : (
             <Image
-              src={poster || "/placeholder.svg"}
+              src={poster || "/placeholder.svg?height=300&width=200&query=movie poster"}
               alt={title}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-105"
               sizes="(max-width: 640px) 160px, (max-width: 768px) 180px, 200px"
-              onError={() => setImageError(true)}
+              onError={handleImageError}
               loading="lazy"
+              unoptimized
             />
           )}
 
@@ -127,8 +133,8 @@ export function MovieCardMobile({
       {/* Favorite button */}
       {onToggleFavorite && (
         <button
-          className="absolute top-2 left-2 h-8 w-8 rounded-full bg-black/60 flex items-center justify-center active:scale-90 transition-transform"
-          onClick={handleFavoriteClick}
+          className="absolute top-2 left-2 h-9 w-9 rounded-full bg-black/60 flex items-center justify-center"
+          onClick={handleFavoriteToggle}
           aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
         >
           <Heart className={cn("h-4 w-4 transition-colors", isFavorite ? "text-red-500 fill-red-500" : "text-white")} />
@@ -140,7 +146,7 @@ export function MovieCardMobile({
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-lg"
+          className="absolute inset-0 bg-black/40 flex items-center justify-center"
         >
           <Heart className="h-12 w-12 text-red-500 fill-red-500" />
         </motion.div>

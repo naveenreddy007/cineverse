@@ -119,7 +119,7 @@ export default function MovieDetailsPage() {
   }
 
   return (
-    <MobileLayout hideFooterNav={false}>
+    <MobileLayout>
       <div className="pb-16">
         {/* Backdrop and poster */}
         <div className="relative h-[30vh] sm:h-[40vh] w-full overflow-hidden">

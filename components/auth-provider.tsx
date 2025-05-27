@@ -42,8 +42,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (storedUser) {
       setUser(JSON.parse(storedUser))
     }
+
+    // Add this code to check URL parameters for auth redirects
+    const params = new URLSearchParams(window.location.search)
+    const authSuccess = params.get("auth") === "success"
+
+    if (authSuccess && !storedUser) {
+      // If auth success parameter is present but no user is stored,
+      // fetch user data or use demo user
+      const userData = {
+        id: DEMO_USER.id,
+        email: DEMO_USER.email,
+        name: DEMO_USER.name,
+        avatar: DEMO_USER.avatar,
+      }
+      setUser(userData)
+      localStorage.setItem("movieDashboardUser", JSON.stringify(userData))
+    }
+
     setIsLoading(false)
   }, [])
+
+  // Add this after the useEffect
+  useEffect(() => {
+    console.log("Auth state changed:", { user, isLoading })
+  }, [user, isLoading])
 
   const signIn = async (email: string, password: string) => {
     // Simple mock authentication

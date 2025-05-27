@@ -1,8 +1,9 @@
 "use client"
-import { useMobile } from "@/hooks/use-mobile"
 import { useDisableZoom } from "@/hooks/use-disable-zoom"
-import { MobileLayout } from "@/components/mobile-layout"
 import { MobileMovieGrid } from "@/components/mobile-movie-grid"
+import Link from "next/link"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Film, Calendar, Star, Heart, MessageSquare, TrendingUp } from "lucide-react"
 
 // Sample data for testing
 const featuredMovies = [
@@ -56,8 +57,6 @@ const featuredMovies = [
 const watchlist = ["1", "3"] // Sample watchlist data
 
 export default function DashboardPage() {
-  const { isMobile } = useMobile()
-
   // Disable zoom for mobile
   useDisableZoom()
 
@@ -68,32 +67,111 @@ export default function DashboardPage() {
   }
 
   return (
-    <MobileLayout>
-      <div className="py-4">
-        <h1 className="text-2xl font-bold mb-6">Welcome to SidduVerse</h1>
+    <div className="py-4">
+      <h1 className="text-2xl font-bold mb-6">Welcome to SidduVerse</h1>
 
-        {/* Movie lists */}
-        <MobileMovieGrid
-          title="Continue Watching"
-          movies={featuredMovies.slice(0, 4)}
-          favorites={watchlist}
-          onToggleFavorite={handleToggleFavorite}
-        />
+      {/* Movie lists */}
+      <MobileMovieGrid
+        title="Continue Watching"
+        movies={featuredMovies.slice(0, 4)}
+        favorites={watchlist}
+        onToggleFavorite={handleToggleFavorite}
+        linkPrefix="/movies"
+      />
 
-        <MobileMovieGrid
-          title="Trending This Week"
-          movies={featuredMovies}
-          favorites={watchlist}
-          onToggleFavorite={handleToggleFavorite}
-        />
+      <MobileMovieGrid
+        title="Trending This Week"
+        movies={featuredMovies}
+        favorites={watchlist}
+        onToggleFavorite={handleToggleFavorite}
+        linkPrefix="/movies"
+      />
 
-        <MobileMovieGrid
-          title="New Releases"
-          movies={featuredMovies.slice().reverse()}
-          favorites={watchlist}
-          onToggleFavorite={handleToggleFavorite}
-        />
+      <MobileMovieGrid
+        title="New Releases"
+        movies={featuredMovies.slice().reverse()}
+        favorites={watchlist}
+        onToggleFavorite={handleToggleFavorite}
+        linkPrefix="/movies"
+      />
+
+      <div className="mt-8 mb-16">
+        <h2 className="text-xl font-bold mb-4">Features</h2>
+
+        <div className="grid grid-cols-2 gap-4">
+          <Link href="/dashboard/movies" className="block">
+            <Card>
+              <CardHeader className="pb-2">
+                <Film className="h-6 w-6 text-primary mb-1" />
+                <CardTitle className="text-base">Movies</CardTitle>
+              </CardHeader>
+              <CardContent className="pb-2">
+                <CardDescription>Browse and discover movies</CardDescription>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/dashboard/watchlist" className="block">
+            <Card>
+              <CardHeader className="pb-2">
+                <Heart className="h-6 w-6 text-red-500 mb-1" />
+                <CardTitle className="text-base">Watchlist</CardTitle>
+              </CardHeader>
+              <CardContent className="pb-2">
+                <CardDescription>Movies you want to watch</CardDescription>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/dashboard/reviews" className="block">
+            <Card>
+              <CardHeader className="pb-2">
+                <Star className="h-6 w-6 text-yellow-500 mb-1" />
+                <CardTitle className="text-base">Reviews</CardTitle>
+              </CardHeader>
+              <CardContent className="pb-2">
+                <CardDescription>Rate and review movies</CardDescription>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/dashboard/calendar" className="block">
+            <Card>
+              <CardHeader className="pb-2">
+                <Calendar className="h-6 w-6 text-blue-500 mb-1" />
+                <CardTitle className="text-base">Calendar</CardTitle>
+              </CardHeader>
+              <CardContent className="pb-2">
+                <CardDescription>Upcoming movie releases</CardDescription>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/dashboard/forum" className="block">
+            <Card>
+              <CardHeader className="pb-2">
+                <MessageSquare className="h-6 w-6 text-green-500 mb-1" />
+                <CardTitle className="text-base">Forum</CardTitle>
+              </CardHeader>
+              <CardContent className="pb-2">
+                <CardDescription>Discuss movies with others</CardDescription>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/quiz" className="block">
+            <Card>
+              <CardHeader className="pb-2">
+                <TrendingUp className="h-6 w-6 text-purple-500 mb-1" />
+                <CardTitle className="text-base">Movie Quiz</CardTitle>
+              </CardHeader>
+              <CardContent className="pb-2">
+                <CardDescription>Test your movie knowledge</CardDescription>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
       </div>
-    </MobileLayout>
+    </div>
   )
 }

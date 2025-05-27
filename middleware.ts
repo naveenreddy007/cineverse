@@ -1,23 +1,31 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
-export async function middleware(req: NextRequest) {
-  // This is a simplified middleware that doesn't actually check auth
-  // In a real app, you would verify the session/token here
+export function middleware(request: NextRequest) {
+  // Get the pathname of the request
+  const path = request.nextUrl.pathname
 
-  // For demo purposes, we'll just redirect to login if accessing protected routes
-  if (req.nextUrl.pathname.startsWith("/dashboard") || req.nextUrl.pathname.startsWith("/admin")) {
-    // Check if user is logged in by looking for a token in localStorage
-    // Since this is server-side code, we can't access localStorage directly
-    // In a real app, you would check for a valid session cookie
+  // Define public paths that don't require authentication
+  const isPublicPath = path === "/login" || path === "/register" || path === "/" || path.startsWith("/api/auth")
 
-    // For demo purposes, we'll just let it pass through and let client-side auth handle it
-    return NextResponse.next()
+  // Check if user is authenticated by looking for the auth cookie
+  const isAuthenticated = request.cookies.has("movieDashboardUser")
+
+  // Redirect logic
+  if (!isAuthenticated && !isPublicPath) {
+    // Redirect unauthenticated users to login page
+    return NextResponse.redirect(new URL("/login", request.url))
+  }
+
+  if (isAuthenticated && (path === "/login" || path === "/register")) {
+    // Redirect authenticated users to dashboard if they try to access login/register
+    return NextResponse.redirect(new URL("/dashboard", request.url))
   }
 
   return NextResponse.next()
 }
 
+// Configure the middleware to run on specific paths
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin/:path*"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$).*)"],
 }

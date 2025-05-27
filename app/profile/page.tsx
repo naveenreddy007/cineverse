@@ -5,34 +5,27 @@ import Image from "next/image"
 import { MobileLayout } from "@/components/mobile-layout"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
+import { useDisableZoom } from "@/hooks/use-disable-zoom"
+import { Camera, Edit, LogOut, Settings, Star, Film, Heart, Calendar } from "lucide-react"
 import { MovieCardMobile } from "@/components/movie-card-mobile"
-import { Settings, Edit, Film, Star, Clock, Calendar, Users, ChevronRight } from "lucide-react"
-import { useMobile } from "@/hooks/use-mobile"
 
 // Sample user data
 const userData = {
-  id: "user1",
   name: "Siddu",
-  username: "@siddu",
-  bio: "Founder of SidduVerse. Film enthusiast and critic. I believe cinema is the most powerful art form that can change perspectives and inspire generations.",
+  username: "sidduverse",
+  bio: "Founder & Cinephile. Passionate about storytelling through cinema.",
   avatar: "/placeholder-ypk8u.png",
-  coverImage: "https://image.tmdb.org/t/p/original/fm6KqXpk3M2HVveHwCrBSSBaO0V.jpg",
   stats: {
+    movies: 1500,
+    series: 200,
     reviews: 850,
-    watchlist: 320,
-    following: 128,
-    followers: 1024,
+    followers: 1240,
+    following: 350,
   },
-  favoriteGenres: ["Drama", "Sci-Fi", "Thriller"],
-  recentActivity: [
-    { type: "review", movie: "Oppenheimer", date: "2 days ago" },
-    { type: "watchlist", movie: "Barbie", date: "1 week ago" },
-    { type: "rating", movie: "Mission: Impossible", rating: 4.5, date: "2 weeks ago" },
-  ],
 }
 
-// Sample movies for watchlist
-const watchlistMovies = [
+// Sample movies for different tabs
+const favoriteMovies = [
   {
     id: "1",
     title: "Oppenheimer",
@@ -44,201 +37,245 @@ const watchlistMovies = [
   },
   {
     id: "2",
-    title: "Barbie",
-    poster: "https://image.tmdb.org/t/p/w500/iuFNMS8U5cb6xfzi8Qzsk3Ql7wG.jpg",
-    year: 2023,
-    rating: 4.2,
-    runtime: "1h 54m",
-    genres: ["Comedy", "Adventure", "Fantasy"],
+    title: "Dune",
+    poster: "https://image.tmdb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg",
+    year: 2021,
+    rating: 4.6,
+    runtime: "2h 35m",
+    genres: ["Science Fiction", "Adventure"],
   },
+]
+
+const watchedMovies = [
   {
     id: "3",
-    title: "Mission: Impossible - Dead Reckoning",
-    poster: "https://image.tmdb.org/t/p/w500/NNxYkU70HPurnNCSiCjYAmacwm.jpg",
-    year: 2023,
+    title: "Everything Everywhere All at Once",
+    poster: "https://image.tmdb.org/t/p/w500/w3LxiVYdWWRvEVdn5RYq6jIqkb1.jpg",
+    year: 2022,
+    rating: 4.7,
+    runtime: "2h 19m",
+    genres: ["Action", "Adventure", "Science Fiction"],
+  },
+  {
+    id: "4",
+    title: "The Batman",
+    poster: "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg",
+    year: 2022,
+    rating: 4.3,
+    runtime: "2h 56m",
+    genres: ["Crime", "Mystery", "Thriller"],
+  },
+]
+
+const watchlistMovies = [
+  {
+    id: "5",
+    title: "Top Gun: Maverick",
+    poster: "https://image.tmdb.org/t/p/w500/62HCnUTziyWcpDaBO2i1DX17ljH.jpg",
+    year: 2022,
     rating: 4.5,
-    runtime: "2h 43m",
-    genres: ["Action", "Adventure", "Thriller"],
+    runtime: "2h 11m",
+    genres: ["Action", "Drama"],
+  },
+  {
+    id: "6",
+    title: "The Whale",
+    poster: "https://image.tmdb.org/t/p/w500/jQ0gylJMxWSL490sy0RrPj1Lj7e.jpg",
+    year: 2022,
+    rating: 4.2,
+    runtime: "1h 57m",
+    genres: ["Drama"],
   },
 ]
 
 export default function ProfilePage() {
-  const { isMobile } = useMobile()
-  const [activeTab, setActiveTab] = useState("activity")
-  const [favorites, setFavorites] = useState<string[]>(["1"])
-
-  const handleToggleFavorite = (id: string) => {
-    if (favorites.includes(id)) {
-      setFavorites(favorites.filter((movieId) => movieId !== id))
-    } else {
-      setFavorites([...favorites, id])
-    }
-  }
+  const [activeTab, setActiveTab] = useState("watched")
+  useDisableZoom()
 
   return (
     <MobileLayout>
-      <div className="pb-16">
-        {/* Cover image and profile info */}
-        <div className="relative">
-          <div className="h-32 w-full overflow-hidden">
-            <Image src={userData.coverImage || "/placeholder.svg"} alt="Cover" fill className="object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-background/90" />
-          </div>
+      {/* Profile header */}
+      <div className="relative">
+        {/* Cover photo */}
+        <div className="h-32 bg-gradient-to-r from-blue-500 to-purple-600 relative">
+          <Button
+            size="icon"
+            variant="ghost"
+            className="absolute bottom-2 right-2 bg-black/20 backdrop-blur-sm text-white"
+          >
+            <Camera className="h-4 w-4" />
+            <span className="sr-only">Change cover photo</span>
+          </Button>
+        </div>
 
-          <div className="absolute -bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center">
-            <div className="relative h-24 w-24 rounded-full border-4 border-background overflow-hidden">
-              <Image src={userData.avatar || "/placeholder.svg"} alt={userData.name} fill className="object-cover" />
-            </div>
-            <h1 className="mt-2 text-xl font-bold">{userData.name}</h1>
-            <p className="text-sm text-muted-foreground">{userData.username}</p>
+        {/* Avatar */}
+        <div className="absolute bottom-0 left-4 transform translate-y-1/2">
+          <div className="relative h-24 w-24 rounded-full border-4 border-background overflow-hidden">
+            <Image src={userData.avatar || "/placeholder.svg"} alt="Profile picture" fill className="object-cover" />
+            <Button size="icon" variant="ghost" className="absolute bottom-0 right-0 h-8 w-8 bg-black/60 text-white">
+              <Camera className="h-4 w-4" />
+              <span className="sr-only">Change profile picture</span>
+            </Button>
           </div>
         </div>
+
+        {/* Edit profile button */}
+        <div className="flex justify-end p-4">
+          <Button size="sm" variant="outline" className="gap-1">
+            <Edit className="h-4 w-4" />
+            Edit Profile
+          </Button>
+        </div>
+      </div>
+
+      {/* Profile info */}
+      <div className="mt-14 px-4">
+        <h1 className="text-xl font-bold">{userData.name}</h1>
+        <p className="text-sm text-muted-foreground">@{userData.username}</p>
+        <p className="mt-2 text-sm">{userData.bio}</p>
 
         {/* Stats */}
-        <div className="mt-20 flex justify-around py-4 border-y">
+        <div className="flex justify-between mt-4 text-sm">
           <div className="text-center">
-            <div className="text-lg font-bold">{userData.stats.reviews}</div>
+            <div className="font-bold">{userData.stats.movies.toLocaleString()}+</div>
+            <div className="text-xs text-muted-foreground">Movies</div>
+          </div>
+          <div className="text-center">
+            <div className="font-bold">{userData.stats.series.toLocaleString()}+</div>
+            <div className="text-xs text-muted-foreground">Series</div>
+          </div>
+          <div className="text-center">
+            <div className="font-bold">{userData.stats.reviews.toLocaleString()}+</div>
             <div className="text-xs text-muted-foreground">Reviews</div>
           </div>
+        </div>
 
+        <div className="flex justify-between mt-2 text-sm">
           <div className="text-center">
-            <div className="text-lg font-bold">{userData.stats.watchlist}</div>
-            <div className="text-xs text-muted-foreground">Watchlist</div>
-          </div>
-
-          <div className="text-center">
-            <div className="text-lg font-bold">{userData.stats.following}</div>
-            <div className="text-xs text-muted-foreground">Following</div>
-          </div>
-
-          <div className="text-center">
-            <div className="text-lg font-bold">{userData.stats.followers}</div>
+            <div className="font-bold">{userData.stats.followers.toLocaleString()}</div>
             <div className="text-xs text-muted-foreground">Followers</div>
           </div>
-        </div>
-
-        {/* Bio */}
-        <div className="px-4 py-6">
-          <p className="text-sm text-center">{userData.bio}</p>
-
-          <div className="flex justify-center gap-2 mt-4">
-            <Button variant="outline" size="sm" className="flex items-center gap-1">
-              <Edit className="h-3.5 w-3.5" />
-              <span>Edit Profile</span>
-            </Button>
-
-            <Button variant="outline" size="sm" className="flex items-center gap-1">
-              <Settings className="h-3.5 w-3.5" />
-              <span>Settings</span>
-            </Button>
+          <div className="text-center">
+            <div className="font-bold">{userData.stats.following.toLocaleString()}</div>
+            <div className="text-xs text-muted-foreground">Following</div>
           </div>
         </div>
+      </div>
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-3 mb-6">
-            <TabsTrigger value="activity">Activity</TabsTrigger>
-            <TabsTrigger value="watchlist">Watchlist</TabsTrigger>
-            <TabsTrigger value="reviews">Reviews</TabsTrigger>
-          </TabsList>
+      {/* Content tabs */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
+        <TabsList className="grid grid-cols-4 mb-4">
+          <TabsTrigger value="watched" className="flex flex-col items-center gap-1 p-2 h-auto">
+            <Film className="h-4 w-4" />
+            <span className="text-xs">Watched</span>
+          </TabsTrigger>
+          <TabsTrigger value="favorites" className="flex flex-col items-center gap-1 p-2 h-auto">
+            <Heart className="h-4 w-4" />
+            <span className="text-xs">Favorites</span>
+          </TabsTrigger>
+          <TabsTrigger value="watchlist" className="flex flex-col items-center gap-1 p-2 h-auto">
+            <Calendar className="h-4 w-4" />
+            <span className="text-xs">Watchlist</span>
+          </TabsTrigger>
+          <TabsTrigger value="reviews" className="flex flex-col items-center gap-1 p-2 h-auto">
+            <Star className="h-4 w-4" />
+            <span className="text-xs">Reviews</span>
+          </TabsTrigger>
+        </TabsList>
 
-          <TabsContent value="activity" className="space-y-4">
-            {/* Recent activity */}
-            <div className="space-y-4">
-              {userData.recentActivity.map((activity, index) => (
-                <div key={index} className="flex items-start gap-3 p-3 border rounded-lg">
-                  <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-                    {activity.type === "review" && <Star className="h-4 w-4" />}
-                    {activity.type === "watchlist" && <Film className="h-4 w-4" />}
-                    {activity.type === "rating" && <Star className="h-4 w-4" />}
-                  </div>
+        <TabsContent value="watched">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {watchedMovies.map((movie) => (
+              <MovieCardMobile
+                key={movie.id}
+                id={movie.id}
+                title={movie.title}
+                poster={movie.poster}
+                year={movie.year}
+                rating={movie.rating}
+                runtime={movie.runtime}
+                genres={movie.genres}
+              />
+            ))}
+          </div>
+        </TabsContent>
 
-                  <div className="flex-1">
-                    <div className="text-sm">
-                      {activity.type === "review" && (
-                        <span>
-                          You reviewed <strong>{activity.movie}</strong>
-                        </span>
-                      )}
-                      {activity.type === "watchlist" && (
-                        <span>
-                          You added <strong>{activity.movie}</strong> to your watchlist
-                        </span>
-                      )}
-                      {activity.type === "rating" && (
-                        <span>
-                          You rated <strong>{activity.movie}</strong>{" "}
-                          <span className="inline-flex items-center">
-                            <Star className="h-3 w-3 text-yellow-400 fill-yellow-400 mr-0.5" />
-                            {activity.rating}
-                          </span>
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-xs text-muted-foreground mt-1">{activity.date}</div>
-                  </div>
+        <TabsContent value="favorites">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {favoriteMovies.map((movie) => (
+              <MovieCardMobile
+                key={movie.id}
+                id={movie.id}
+                title={movie.title}
+                poster={movie.poster}
+                year={movie.year}
+                rating={movie.rating}
+                runtime={movie.runtime}
+                genres={movie.genres}
+              />
+            ))}
+          </div>
+        </TabsContent>
 
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+        <TabsContent value="watchlist">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {watchlistMovies.map((movie) => (
+              <MovieCardMobile
+                key={movie.id}
+                id={movie.id}
+                title={movie.title}
+                poster={movie.poster}
+                year={movie.year}
+                rating={movie.rating}
+                runtime={movie.runtime}
+                genres={movie.genres}
+              />
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="reviews">
+          <div className="space-y-4">
+            {favoriteMovies.map((movie) => (
+              <div key={movie.id} className="flex gap-3 p-3 rounded-lg bg-muted/20">
+                <div className="relative h-16 w-12 rounded overflow-hidden flex-shrink-0">
+                  <Image src={movie.poster || "/placeholder.svg"} alt={movie.title} fill className="object-cover" />
                 </div>
-              ))}
-            </div>
-
-            {/* Stats cards */}
-            <div className="grid grid-cols-2 gap-4 mt-6">
-              <div className="p-4 border rounded-lg flex flex-col items-center">
-                <Clock className="h-6 w-6 text-neon-blue mb-2" />
-                <div className="text-lg font-bold">1,250+</div>
-                <div className="text-xs text-muted-foreground text-center">Hours of movies watched</div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium">{movie.title}</h3>
+                    <div className="flex items-center gap-1">
+                      <Star className="h-3 w-3 text-yellow-400 fill-yellow-400" />
+                      <span className="text-xs">{movie.rating.toFixed(1)}</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1 line-clamp-3">
+                    "This is an incredible film that pushes the boundaries of cinematography. The performances are
+                    outstanding and the story is captivating from start to finish."
+                  </p>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Reviewed on {new Date().toLocaleDateString()}
+                  </div>
+                </div>
               </div>
+            ))}
+          </div>
+        </TabsContent>
+      </Tabs>
 
-              <div className="p-4 border rounded-lg flex flex-col items-center">
-                <Calendar className="h-6 w-6 text-neon-magenta mb-2" />
-                <div className="text-lg font-bold">2+ years</div>
-                <div className="text-xs text-muted-foreground text-center">Member since 2021</div>
-              </div>
-
-              <div className="p-4 border rounded-lg flex flex-col items-center">
-                <Film className="h-6 w-6 text-green-500 mb-2" />
-                <div className="text-lg font-bold">1,500+</div>
-                <div className="text-xs text-muted-foreground text-center">Movies watched</div>
-              </div>
-
-              <div className="p-4 border rounded-lg flex flex-col items-center">
-                <Users className="h-6 w-6 text-orange-500 mb-2" />
-                <div className="text-lg font-bold">Top 5%</div>
-                <div className="text-xs text-muted-foreground text-center">Most active users</div>
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="watchlist">
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {watchlistMovies.map((movie) => (
-                <MovieCardMobile
-                  key={movie.id}
-                  id={movie.id}
-                  title={movie.title}
-                  poster={movie.poster}
-                  year={movie.year}
-                  rating={movie.rating}
-                  runtime={movie.runtime}
-                  genres={movie.genres}
-                  isFavorite={favorites.includes(movie.id)}
-                  onToggleFavorite={handleToggleFavorite}
-                />
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="reviews">
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <Star className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-medium">Your reviews will appear here</h3>
-              <p className="text-sm text-muted-foreground mt-1">Start reviewing movies to see them here</p>
-              <Button className="mt-4">Write a Review</Button>
-            </div>
-          </TabsContent>
-        </Tabs>
+      {/* Account actions */}
+      <div className="mt-8 space-y-2 pb-20">
+        <Button variant="outline" className="w-full justify-start gap-2">
+          <Settings className="h-4 w-4" />
+          Settings
+        </Button>
+        <Button
+          variant="outline"
+          className="w-full justify-start gap-2 text-red-500 hover:text-red-600 hover:bg-red-100/10"
+        >
+          <LogOut className="h-4 w-4" />
+          Log Out
+        </Button>
       </div>
     </MobileLayout>
   )

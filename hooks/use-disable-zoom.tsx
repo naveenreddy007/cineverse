@@ -1,44 +1,47 @@
 "use client"
 
 import { useEffect } from "react"
-import { useMobile } from "@/hooks/use-mobile"
 
 export function useDisableZoom() {
-  const { isMobile, isTablet } = useMobile()
-
   useEffect(() => {
-    if (!isMobile && !isTablet) return
+    // Only run on client
+    if (typeof window === "undefined" || typeof document === "undefined") return
 
-    // Add viewport meta tag to prevent zooming
-    const viewportMeta = document.querySelector('meta[name="viewport"]')
-    const originalContent = viewportMeta?.getAttribute("content") || ""
-
-    if (viewportMeta) {
-      viewportMeta.setAttribute("content", "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
-    } else {
-      // Create meta tag if it doesn't exist
-      const meta = document.createElement("meta")
-      meta.name = "viewport"
-      meta.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
-      document.head.appendChild(meta)
-    }
-
-    // Handle double-tap events
-    const handleTouchStart = (e: TouchEvent) => {
+    // Prevent pinch zoom
+    const handleTouchMove = (e: TouchEvent) => {
       if (e.touches.length > 1) {
         e.preventDefault()
       }
     }
 
-    document.addEventListener("touchstart", handleTouchStart, { passive: false })
+    // Add meta viewport tag to disable zoom
+    const setViewport = () => {
+      let viewport = document.querySelector('meta[name="viewport"]')
 
-    return () => {
-      // Restore original viewport meta
-      if (viewportMeta && originalContent) {
-        viewportMeta.setAttribute("content", originalContent)
+      if (!viewport) {
+        viewport = document.createElement("meta")
+        viewport.name = "viewport"
+        document.head.appendChild(viewport)
       }
 
-      document.removeEventListener("touchstart", handleTouchStart)
+      viewport.setAttribute("content", "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no")
     }
-  }, [isMobile, isTablet])
+
+    // Apply viewport changes
+    setViewport()
+
+    // Add touch event listeners
+    document.addEventListener("touchmove", handleTouchMove, { passive: false })
+
+    // Clean up
+    return () => {
+      document.removeEventListener("touchmove", handleTouchMove)
+
+      // Reset viewport when component unmounts
+      const viewport = document.querySelector('meta[name="viewport"]')
+      if (viewport) {
+        viewport.setAttribute("content", "width=device-width, initial-scale=1.0")
+      }
+    }
+  }, [])
 }
