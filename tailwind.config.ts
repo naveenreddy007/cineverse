@@ -12,11 +12,7 @@ const config: Config = {
   theme: {
     container: {
       center: true,
-      padding: {
-        DEFAULT: "1rem",
-        sm: "1.5rem",
-        lg: "2rem",
-      },
+      padding: "2rem",
       screens: {
         "2xl": "1400px",
       },
@@ -110,22 +106,6 @@ const config: Config = {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
         },
-        "slide-in-right": {
-          "0%": { transform: "translateX(100%)" },
-          "100%": { transform: "translateX(0)" },
-        },
-        "slide-out-right": {
-          "0%": { transform: "translateX(0)" },
-          "100%": { transform: "translateX(100%)" },
-        },
-        "slide-in-bottom": {
-          "0%": { transform: "translateY(100%)" },
-          "100%": { transform: "translateY(0)" },
-        },
-        "slide-out-bottom": {
-          "0%": { transform: "translateY(0)" },
-          "100%": { transform: "translateY(100%)" },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -138,60 +118,13 @@ const config: Config = {
         "pulse-slower": "pulse-slower 7s ease-in-out infinite",
         "rotate-slow": "rotate-slow 20s linear infinite",
         shimmer: "shimmer 8s ease-in-out infinite",
-        "slide-in-right": "slide-in-right 0.3s ease-out",
-        "slide-out-right": "slide-out-right 0.3s ease-out",
-        "slide-in-bottom": "slide-in-bottom 0.3s ease-out",
-        "slide-out-bottom": "slide-out-bottom 0.3s ease-out",
       },
       scale: {
         "102": "1.02",
       },
-      spacing: {
-        "safe-top": "env(safe-area-inset-top)",
-        "safe-bottom": "env(safe-area-inset-bottom)",
-        "safe-left": "env(safe-area-inset-left)",
-        "safe-right": "env(safe-area-inset-right)",
-      },
-      height: {
-        screen: ["100vh", "100dvh"],
-      },
-      minHeight: {
-        screen: ["100vh", "100dvh"],
-      },
-      maxHeight: {
-        screen: ["100vh", "100dvh"],
-      },
     },
   },
-  plugins: [
-    require("tailwindcss-animate"),
-    ({ addUtilities }) => {
-      const newUtilities = {
-        ".tap-highlight-transparent": {
-          "-webkit-tap-highlight-color": "transparent",
-        },
-        ".touch-manipulation": {
-          "touch-action": "manipulation",
-        },
-        ".overscroll-none": {
-          "overscroll-behavior": "none",
-        },
-        ".pb-safe": {
-          "padding-bottom": "env(safe-area-inset-bottom, 0px)",
-        },
-        ".pt-safe": {
-          "padding-top": "env(safe-area-inset-top, 0px)",
-        },
-        ".pl-safe": {
-          "padding-left": "env(safe-area-inset-left, 0px)",
-        },
-        ".pr-safe": {
-          "padding-right": "env(safe-area-inset-right, 0px)",
-        },
-      }
-      addUtilities(newUtilities)
-    },
-  ],
+  plugins: [require("tailwindcss-animate")],
 }
 
 export default config

@@ -1,117 +1,58 @@
 "use client"
 
-import { usePathname, useRouter } from "next/navigation"
-import { motion } from "framer-motion"
-import { ArrowLeft, Bell, MoreVertical } from "lucide-react"
+import { ArrowLeft, Search, MoreVertical } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useHaptic } from "@/hooks/use-haptic"
+import { useRouter } from "next/navigation"
+import { useAuth } from "./auth-provider"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 interface MobileAppBarProps {
   title?: string
   showBack?: boolean
-  showNotifications?: boolean
-  showMenu?: boolean
-  onNotificationsClick?: () => void
-  onMenuClick?: () => void
+  onBack?: () => void
 }
 
-export function MobileAppBar({
-  title,
-  showBack = false,
-  showNotifications = true,
-  showMenu = true,
-  onNotificationsClick,
-  onMenuClick,
-}: MobileAppBarProps) {
+export function MobileAppBar({ title = "SidduVerse", showBack, onBack }: MobileAppBarProps) {
   const router = useRouter()
-  const pathname = usePathname()
-  const { trigger, patterns } = useHaptic()
-
-  // Determine title based on pathname if not provided
-  const pageTitle = title || getPageTitle(pathname)
+  const { user } = useAuth()
 
   const handleBack = () => {
-    trigger(patterns.medium)
-    router.back()
-  }
-
-  const handleNotifications = () => {
-    trigger(patterns.light)
-    if (onNotificationsClick) {
-      onNotificationsClick()
-    }
-  }
-
-  const handleMenu = () => {
-    trigger(patterns.light)
-    if (onMenuClick) {
-      onMenuClick()
+    if (onBack) {
+      onBack()
+    } else {
+      router.back()
     }
   }
 
   return (
-    <motion.div
-      className="sticky top-0 left-0 right-0 z-40 md:hidden"
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-    >
-      {/* Blurred background effect */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-md border-b border-white/10" />
-
-      {/* App bar content */}
-      <div className="relative flex items-center justify-between h-14 px-4">
-        <div className="flex items-center">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
+      <div className="flex items-center justify-between h-14 px-4">
+        <div className="flex items-center gap-3">
           {showBack && (
-            <Button variant="ghost" size="icon" className="h-10 w-10 mr-2 rounded-full" onClick={handleBack}>
-              <ArrowLeft className="h-5 w-5" />
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleBack}>
+              <ArrowLeft className="h-4 w-4" />
             </Button>
           )}
-          <h1 className="text-lg font-bold truncate max-w-[200px]">{pageTitle}</h1>
+          <h1 className="text-lg font-semibold truncate">{title}</h1>
         </div>
 
         <div className="flex items-center gap-2">
-          {showNotifications && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-10 w-10 rounded-full relative"
-              onClick={handleNotifications}
-            >
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full" />
-            </Button>
-          )}
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => router.push("/search")}>
+            <Search className="h-4 w-4" />
+          </Button>
 
-          {showMenu && (
-            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full" onClick={handleMenu}>
-              <MoreVertical className="h-5 w-5" />
+          {user ? (
+            <Avatar className="h-8 w-8" onClick={() => router.push("/profile")}>
+              <AvatarImage src={user.user_metadata?.avatar_url || "/placeholder.svg"} />
+              <AvatarFallback>{user.user_metadata?.name?.[0] || user.email?.[0]}</AvatarFallback>
+            </Avatar>
+          ) : (
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <MoreVertical className="h-4 w-4" />
             </Button>
           )}
         </div>
       </div>
-    </motion.div>
+    </header>
   )
-}
-
-// Helper function to determine page title based on pathname
-function getPageTitle(pathname: string): string {
-  if (pathname === "/dashboard") return "Home"
-  if (pathname === "/dashboard/discover") return "Discover"
-  if (pathname === "/dashboard/watchlist") return "Watchlist"
-  if (pathname === "/dashboard/reviews") return "Reviews"
-  if (pathname === "/dashboard/forum") return "Forum"
-  if (pathname === "/profile") return "Profile"
-  if (pathname.includes("/movies/")) return "Movie Details"
-  if (pathname.includes("/featured/")) return "Featured Movie"
-
-  // Extract the last segment of the path
-  const segments = pathname.split("/")
-  const lastSegment = segments[segments.length - 1]
-
-  // Capitalize and replace hyphens with spaces
-  return lastSegment
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ")
 }

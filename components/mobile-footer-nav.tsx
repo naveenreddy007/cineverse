@@ -1,136 +1,51 @@
 "use client"
 
-import { useState } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { Home, Search, Film, Heart, User, Plus, MessageSquare } from "lucide-react"
+import { Home, Search, Heart, User, Film } from "lucide-react"
+import { usePathname, useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
-import { motion, AnimatePresence } from "framer-motion"
 import { useHaptic } from "@/hooks/use-haptic"
+
+const navItems = [
+  { icon: Home, label: "Home", href: "/dashboard" },
+  { icon: Search, label: "Search", href: "/search" },
+  { icon: Film, label: "Movies", href: "/discover" },
+  { icon: Heart, label: "Watchlist", href: "/dashboard/watchlist" },
+  { icon: User, label: "Profile", href: "/profile" },
+]
 
 export function MobileFooterNav() {
   const pathname = usePathname()
-  const [showActions, setShowActions] = useState(false)
-  const { trigger, patterns } = useHaptic()
+  const router = useRouter()
+  const { triggerHaptic } = useHaptic()
 
-  const navItems = [
-    {
-      name: "Home",
-      href: "/dashboard",
-      icon: Home,
-    },
-    {
-      name: "Discover",
-      href: "/dashboard/discover",
-      icon: Search,
-    },
-    {
-      name: "Watchlist",
-      href: "/dashboard/watchlist",
-      icon: Heart,
-    },
-    {
-      name: "Profile",
-      href: "/profile",
-      icon: User,
-    },
-  ]
-
-  const actionItems = [
-    {
-      name: "Add Review",
-      icon: Film,
-      href: "/dashboard/reviews",
-    },
-    {
-      name: "Take Quiz",
-      icon: MessageSquare,
-      href: "/quiz",
-    },
-    {
-      name: "Forum",
-      icon: MessageSquare,
-      href: "/dashboard/forum",
-    },
-  ]
-
-  const handleActionToggle = () => {
-    trigger(patterns.medium)
-    setShowActions(!showActions)
-  }
-
-  const handleActionSelect = () => {
-    trigger(patterns.light)
-    setShowActions(false)
+  const handleNavigation = (href: string) => {
+    triggerHaptic("light")
+    router.push(href)
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-t border-border/40 pb-safe">
-      <div className="relative">
-        {/* Action menu */}
-        <AnimatePresence>
-          {showActions && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ duration: 0.2 }}
-              className="absolute bottom-16 left-1/2 -translate-x-1/2 bg-background border border-border/40 rounded-lg shadow-lg p-2 w-48"
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-t border-border/50 pb-safe">
+      <div className="flex items-center justify-around h-16 px-2">
+        {navItems.map(({ icon: Icon, label, href }) => {
+          const isActive = pathname === href || (href !== "/dashboard" && pathname.startsWith(href))
+
+          return (
+            <button
+              key={href}
+              onClick={() => handleNavigation(href)}
+              className={cn(
+                "flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-colors",
+                isActive
+                  ? "text-neon-blue bg-neon-blue/10"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
+              )}
             >
-              {actionItems.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className="flex items-center gap-2 p-3 rounded-md hover:bg-accent"
-                  onClick={handleActionSelect}
-                >
-                  <item.icon className="h-5 w-5" />
-                  <span>{item.name}</span>
-                </Link>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Footer navigation */}
-        <div className="flex items-center justify-around h-16 px-2 w-full">
-          {navItems.map((item) => (
-            <Link key={item.name} href={item.href} aria-label={item.name} className="w-1/5 flex justify-center">
-              <div
-                className={cn(
-                  "flex flex-col items-center gap-1 transition-colors py-2 px-3",
-                  pathname === item.href || pathname.startsWith(item.href + "/")
-                    ? "text-primary"
-                    : "text-muted-foreground hover:text-primary",
-                )}
-              >
-                <item.icon className="h-5 w-5" />
-                <span className="text-xs">{item.name}</span>
-              </div>
-            </Link>
-          ))}
-
-          {/* Action button */}
-          <button
-            className="relative w-1/5 flex justify-center"
-            onClick={handleActionToggle}
-            aria-label="Actions"
-            aria-expanded={showActions}
-          >
-            <div className="flex flex-col items-center gap-1 text-primary py-2">
-              <div
-                className={cn(
-                  "h-10 w-10 bg-neon-blue rounded-full flex items-center justify-center transition-transform",
-                  showActions && "rotate-45",
-                )}
-              >
-                <Plus className="h-5 w-5 text-black" />
-              </div>
-              <span className="text-xs">More</span>
-            </div>
-          </button>
-        </div>
+              <Icon className="h-5 w-5" />
+              <span className="text-xs font-medium">{label}</span>
+            </button>
+          )
+        })}
       </div>
-    </div>
+    </nav>
   )
 }

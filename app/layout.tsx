@@ -2,10 +2,10 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
+import { MobileLayout } from "@/components/mobile-layout"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/components/auth-provider"
-import { MobileLayout } from "@/components/mobile-layout"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -25,7 +25,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-            <MobileLayout>{children}</MobileLayout>
+            <MobileLayout hideFooterNav={false}>{children}</MobileLayout>
             <Toaster />
           </ThemeProvider>
         </AuthProvider>

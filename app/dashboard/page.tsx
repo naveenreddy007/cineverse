@@ -1,177 +1,293 @@
 "use client"
-import { useDisableZoom } from "@/hooks/use-disable-zoom"
-import { MobileMovieGrid } from "@/components/mobile-movie-grid"
+
+import { useState, useEffect } from "react"
+import { motion } from "framer-motion"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { MovieCard } from "@/components/movie-card"
+import { TrendingUp, Film, Users, Star, Award, Calendar, Clock, Eye } from "lucide-react"
+import { teluguMoviesService, type TeluguMovie } from "@/lib/telugu-movies-service"
+import { useAuth } from "@/components/auth-provider"
+import { Skeleton } from "@/components/ui/skeleton"
 import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Film, Calendar, Star, Heart, MessageSquare, TrendingUp } from "lucide-react"
-
-// Sample data for testing
-const featuredMovies = [
-  {
-    id: "1",
-    title: "Oppenheimer",
-    poster: "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
-    year: 2023,
-    rating: 4.8,
-    runtime: "3h 0m",
-    genres: ["Biography", "Drama", "History"],
-  },
-  {
-    id: "2",
-    title: "Dune",
-    poster: "https://image.tmdb.org/t/p/w500/d5NXSklXo0qyIYkgV94XAgMIckC.jpg",
-    year: 2021,
-    rating: 4.6,
-    runtime: "2h 35m",
-    genres: ["Science Fiction", "Adventure"],
-  },
-  {
-    id: "3",
-    title: "Everything Everywhere All at Once",
-    poster: "https://image.tmdb.org/t/p/w500/w3LxiVYdWWRvEVdn5RYq6jIqkb1.jpg",
-    year: 2022,
-    rating: 4.7,
-    runtime: "2h 19m",
-    genres: ["Action", "Adventure", "Science Fiction"],
-  },
-  {
-    id: "4",
-    title: "The Batman",
-    poster: "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg",
-    year: 2022,
-    rating: 4.3,
-    runtime: "2h 56m",
-    genres: ["Crime", "Mystery", "Thriller"],
-  },
-  {
-    id: "5",
-    title: "Top Gun: Maverick",
-    poster: "https://image.tmdb.org/t/p/w500/62HCnUTziyWcpDaBO2i1DX17ljH.jpg",
-    year: 2022,
-    rating: 4.5,
-    runtime: "2h 11m",
-    genres: ["Action", "Drama"],
-  },
-]
-
-const watchlist = ["1", "3"] // Sample watchlist data
 
 export default function DashboardPage() {
-  // Disable zoom for mobile
-  useDisableZoom()
+  const { user } = useAuth()
+  const [latestMovies, setLatestMovies] = useState<TeluguMovie[]>([])
+  const [trendingMovies, setTrendingMovies] = useState<TeluguMovie[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [favorites, setFavorites] = useState<Set<string>>(new Set())
 
-  // Handle toggle favorite
-  const handleToggleFavorite = (id: string) => {
-    console.log("Toggle favorite:", id)
-    // Implement actual favorite toggling logic here
+  useEffect(() => {
+    const loadMovies = async () => {
+      try {
+        setLoading(true)
+        const [latest, trending] = await Promise.all([
+          teluguMoviesService.getLatestTeluguMovies(8),
+          teluguMoviesService.getTrendingTeluguMovies(6),
+        ])
+        setLatestMovies(latest)
+        setTrendingMovies(trending)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to load movies")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadMovies()
+  }, [])
+
+  const handleToggleFavorite = async (movieId: string) => {
+    if (!user) return
+
+    const newFavorites = new Set(favorites)
+    if (favorites.has(movieId)) {
+      newFavorites.delete(movieId)
+      try {
+        await teluguMoviesService.removeFromWatchlist(movieId)
+      } catch (err) {
+        console.error("Failed to remove from watchlist:", err)
+      }
+    } else {
+      newFavorites.add(movieId)
+      try {
+        await teluguMoviesService.addToWatchlist(movieId, "medium")
+      } catch (err) {
+        console.error("Failed to add to watchlist:", err)
+      }
+    }
+    setFavorites(newFavorites)
+  }
+
+  const stats = {
+    totalMovies: latestMovies.length + trendingMovies.length,
+    avgSidduRating: trendingMovies.length
+      ? (trendingMovies.reduce((sum, movie) => sum + (movie.siddu_rating || 0), 0) / trendingMovies.length).toFixed(1)
+      : "0.0",
+    avgAudienceRating: trendingMovies.length
+      ? (trendingMovies.reduce((sum, movie) => sum + (movie.audience_rating || 0), 0) / trendingMovies.length).toFixed(
+          1,
+        )
+      : "0.0",
+    totalBoxOffice: latestMovies.reduce((sum, movie) => sum + (movie.box_office || 0), 0).toLocaleString("en-IN"),
+  }
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-6 space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {Array(4)
+            .fill(0)
+            .map((_, i) => (
+              <Card key={i} className="bg-black/40 backdrop-blur-sm border-border/50">
+                <CardHeader className="pb-2">
+                  <Skeleton className="h-4 w-20" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-8 w-16 mb-2" />
+                  <Skeleton className="h-3 w-24" />
+                </CardContent>
+              </Card>
+            ))}
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {Array(8)
+            .fill(0)
+            .map((_, i) => (
+              <div key={i} className="space-y-2">
+                <Skeleton className="aspect-[2/3] w-full rounded-lg" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-3 w-3/4" />
+              </div>
+            ))}
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto p-6">
+        <Card className="bg-red-500/10 border-red-500/20">
+          <CardContent className="p-6 text-center">
+            <Film className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-red-500 mb-2">Failed to Load Movies</h3>
+            <p className="text-muted-foreground">{error}</p>
+            <Button className="mt-4" onClick={() => window.location.reload()}>
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    )
   }
 
   return (
-    <div className="py-4">
-      <h1 className="text-2xl font-bold mb-6">Welcome to SidduVerse</h1>
+    <div className="container mx-auto p-6 space-y-8">
+      {/* Welcome Section */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center space-y-4">
+        <h1 className="text-4xl font-bold bg-gradient-to-r from-neon-blue to-purple-400 bg-clip-text text-transparent">
+          Welcome to SidduVerse
+        </h1>
+        <p className="text-muted-foreground text-lg">Discover the latest Telugu cinema with our dual rating system</p>
+      </motion.div>
 
-      {/* Movie lists */}
-      <MobileMovieGrid
-        title="Continue Watching"
-        movies={featuredMovies.slice(0, 4)}
-        favorites={watchlist}
-        onToggleFavorite={handleToggleFavorite}
-        linkPrefix="/movies"
-      />
+      {/* Stats Cards */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+      >
+        <Card className="bg-black/40 backdrop-blur-sm border-border/50">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Movies</CardTitle>
+            <Film className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-neon-blue">{stats.totalMovies}</div>
+            <p className="text-xs text-muted-foreground">Latest Telugu releases</p>
+          </CardContent>
+        </Card>
 
-      <MobileMovieGrid
-        title="Trending This Week"
-        movies={featuredMovies}
-        favorites={watchlist}
-        onToggleFavorite={handleToggleFavorite}
-        linkPrefix="/movies"
-      />
+        <Card className="bg-black/40 backdrop-blur-sm border-border/50">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Avg Siddu Rating</CardTitle>
+            <Award className="h-4 w-4 text-neon-blue" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-neon-blue">{stats.avgSidduRating}</div>
+            <p className="text-xs text-muted-foreground">Professional reviews</p>
+          </CardContent>
+        </Card>
 
-      <MobileMovieGrid
-        title="New Releases"
-        movies={featuredMovies.slice().reverse()}
-        favorites={watchlist}
-        onToggleFavorite={handleToggleFavorite}
-        linkPrefix="/movies"
-      />
+        <Card className="bg-black/40 backdrop-blur-sm border-border/50">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Avg Audience Rating</CardTitle>
+            <Users className="h-4 w-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-500">{stats.avgAudienceRating}</div>
+            <p className="text-xs text-muted-foreground">User reviews</p>
+          </CardContent>
+        </Card>
 
-      <div className="mt-8 mb-16">
-        <h2 className="text-xl font-bold mb-4">Features</h2>
+        <Card className="bg-black/40 backdrop-blur-sm border-border/50">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Box Office</CardTitle>
+            <TrendingUp className="h-4 w-4 text-yellow-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-yellow-500">₹{stats.totalBoxOffice}</div>
+            <p className="text-xs text-muted-foreground">Combined collections</p>
+          </CardContent>
+        </Card>
+      </motion.div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <Link href="/dashboard/movies" className="block">
-            <Card>
-              <CardHeader className="pb-2">
-                <Film className="h-6 w-6 text-primary mb-1" />
-                <CardTitle className="text-base">Movies</CardTitle>
-              </CardHeader>
-              <CardContent className="pb-2">
-                <CardDescription>Browse and discover movies</CardDescription>
-              </CardContent>
-            </Card>
-          </Link>
+      {/* Movies Tabs */}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+        <Tabs defaultValue="latest" className="space-y-6">
+          <div className="flex items-center justify-between">
+            <TabsList className="bg-black/40 backdrop-blur-sm border border-border/50">
+              <TabsTrigger value="latest" className="data-[state=active]:bg-neon-blue/20">
+                <Calendar className="h-4 w-4 mr-2" />
+                Latest Releases
+              </TabsTrigger>
+              <TabsTrigger value="trending" className="data-[state=active]:bg-neon-blue/20">
+                <TrendingUp className="h-4 w-4 mr-2" />
+                Trending Now
+              </TabsTrigger>
+            </TabsList>
 
-          <Link href="/dashboard/watchlist" className="block">
-            <Card>
-              <CardHeader className="pb-2">
-                <Heart className="h-6 w-6 text-red-500 mb-1" />
-                <CardTitle className="text-base">Watchlist</CardTitle>
-              </CardHeader>
-              <CardContent className="pb-2">
-                <CardDescription>Movies you want to watch</CardDescription>
-              </CardContent>
-            </Card>
-          </Link>
+            <Link href="/discover">
+              <Button variant="outline" className="bg-black/40 backdrop-blur-sm border-border/50">
+                <Eye className="h-4 w-4 mr-2" />
+                View All
+              </Button>
+            </Link>
+          </div>
 
-          <Link href="/dashboard/reviews" className="block">
-            <Card>
-              <CardHeader className="pb-2">
-                <Star className="h-6 w-6 text-yellow-500 mb-1" />
-                <CardTitle className="text-base">Reviews</CardTitle>
-              </CardHeader>
-              <CardContent className="pb-2">
-                <CardDescription>Rate and review movies</CardDescription>
-              </CardContent>
-            </Card>
-          </Link>
+          <TabsContent value="latest" className="space-y-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {latestMovies.map((movie, index) => (
+                <motion.div
+                  key={movie.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <MovieCard
+                    movie={movie}
+                    onToggleFavorite={handleToggleFavorite}
+                    isFavorite={favorites.has(movie.id)}
+                  />
+                </motion.div>
+              ))}
+            </div>
+          </TabsContent>
 
-          <Link href="/dashboard/calendar" className="block">
-            <Card>
-              <CardHeader className="pb-2">
-                <Calendar className="h-6 w-6 text-blue-500 mb-1" />
-                <CardTitle className="text-base">Calendar</CardTitle>
-              </CardHeader>
-              <CardContent className="pb-2">
-                <CardDescription>Upcoming movie releases</CardDescription>
-              </CardContent>
-            </Card>
-          </Link>
+          <TabsContent value="trending" className="space-y-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              {trendingMovies.map((movie, index) => (
+                <motion.div
+                  key={movie.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <MovieCard
+                    movie={movie}
+                    onToggleFavorite={handleToggleFavorite}
+                    isFavorite={favorites.has(movie.id)}
+                  />
+                </motion.div>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </motion.div>
 
-          <Link href="/dashboard/forum" className="block">
-            <Card>
-              <CardHeader className="pb-2">
-                <MessageSquare className="h-6 w-6 text-green-500 mb-1" />
-                <CardTitle className="text-base">Forum</CardTitle>
-              </CardHeader>
-              <CardContent className="pb-2">
-                <CardDescription>Discuss movies with others</CardDescription>
-              </CardContent>
-            </Card>
-          </Link>
+      {/* Quick Actions */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="grid grid-cols-1 md:grid-cols-3 gap-6"
+      >
+        <Card className="bg-gradient-to-br from-neon-blue/20 to-purple-500/20 border-neon-blue/30">
+          <CardContent className="p-6 text-center">
+            <Star className="h-12 w-12 text-neon-blue mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Write a Review</h3>
+            <p className="text-sm text-muted-foreground mb-4">Share your thoughts on the latest Telugu movies</p>
+            <Button className="bg-neon-blue text-black hover:bg-neon-blue/80">Start Writing</Button>
+          </CardContent>
+        </Card>
 
-          <Link href="/quiz" className="block">
-            <Card>
-              <CardHeader className="pb-2">
-                <TrendingUp className="h-6 w-6 text-purple-500 mb-1" />
-                <CardTitle className="text-base">Movie Quiz</CardTitle>
-              </CardHeader>
-              <CardContent className="pb-2">
-                <CardDescription>Test your movie knowledge</CardDescription>
-              </CardContent>
-            </Card>
-          </Link>
-        </div>
-      </div>
+        <Card className="bg-gradient-to-br from-green-500/20 to-blue-500/20 border-green-500/30">
+          <CardContent className="p-6 text-center">
+            <Users className="h-12 w-12 text-green-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Join Community</h3>
+            <p className="text-sm text-muted-foreground mb-4">Connect with fellow Telugu movie enthusiasts</p>
+            <Button variant="outline" className="border-green-500/50 text-green-500 bg-transparent">
+              Explore Forum
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border-yellow-500/30">
+          <CardContent className="p-6 text-center">
+            <Clock className="h-12 w-12 text-yellow-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Coming Soon</h3>
+            <p className="text-sm text-muted-foreground mb-4">Stay updated with upcoming Telugu releases</p>
+            <Button variant="outline" className="border-yellow-500/50 text-yellow-500 bg-transparent">
+              View Calendar
+            </Button>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   )
 }

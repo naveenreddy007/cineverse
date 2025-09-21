@@ -12,7 +12,6 @@ import { FilmIcon } from "lucide-react"
 import { motion } from "framer-motion"
 import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/components/auth-provider"
-import { UIFormSubmit } from "@/components/ui-form-submit"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("demo@example.com")
@@ -46,11 +45,7 @@ export default function LoginPage() {
         description: "You have successfully logged in.",
       })
 
-      // Add a small delay to ensure the auth state is updated
-      setTimeout(() => {
-        router.push(redirectTo)
-        router.refresh() // Force a refresh to update the UI
-      }, 100)
+      router.push(redirectTo)
     } catch (error) {
       console.error("Login error:", error)
       toast({
@@ -73,7 +68,7 @@ export default function LoginPage() {
         <div className="flex justify-center mb-6">
           <Link href="/" className="flex items-center gap-2">
             <FilmIcon className="h-8 w-8 text-neon-blue" />
-            <span className="text-2xl font-bold tracking-tight neon-text">SidduVerse</span>
+            <span className="text-2xl font-bold tracking-tight neon-text">CineVerse</span>
           </Link>
         </div>
 
@@ -125,7 +120,13 @@ export default function LoginPage() {
                   className="bg-secondary/50"
                 />
               </div>
-              <UIFormSubmit isSubmitting={isLoading} submitText="Sign In" submittingText="Signing in..." />
+              <Button
+                type="submit"
+                className="w-full bg-neon-blue text-black hover:bg-neon-blue/80"
+                disabled={isLoading}
+              >
+                {isLoading ? "Signing in..." : "Sign In"}
+              </Button>
 
               <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">

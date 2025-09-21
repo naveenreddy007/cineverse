@@ -1,115 +1,87 @@
 "use client"
 
 import type React from "react"
+
 import { createContext, useContext, useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import type { User } from "@supabase/auth-helpers-nextjs"
+import type { Database } from "@/types/supabase"
 
-// Mock user type
-export type User = {
-  id: string
-  email: string
-  name: string
-  avatar?: string
-}
-
-type AuthContextType = {
+interface AuthContextType {
   user: User | null
-  isLoading: boolean
-  signIn: (email: string, password: string) => Promise<{ error: any }>
-  signUp: (email: string, password: string, name: string) => Promise<{ error: any; data: any }>
-  signOut: () => void
-}
-
-// Demo user credentials
-const DEMO_USER = {
-  id: "demo-user-id",
-  email: "demo@example.com",
-  password: "password123",
-  name: "Demo User",
-  avatar: "https://i.pravatar.cc/150?img=7",
+  loading: boolean
+  signIn: (email: string, password: string) => Promise<void>
+  signUp: (email: string, password: string, name: string) => Promise<void>
+  signOut: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const router = useRouter()
+  const [loading, setLoading] = useState(true)
+  const supabase = createClientComponentClient<Database>()
 
   useEffect(() => {
-    // Check if user is stored in localStorage
-    const storedUser = localStorage.getItem("movieDashboardUser")
-    if (storedUser) {
-      setUser(JSON.parse(storedUser))
+    const getUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      setUser(user)
+      setLoading(false)
     }
 
-    // Add this code to check URL parameters for auth redirects
-    const params = new URLSearchParams(window.location.search)
-    const authSuccess = params.get("auth") === "success"
+    getUser()
 
-    if (authSuccess && !storedUser) {
-      // If auth success parameter is present but no user is stored,
-      // fetch user data or use demo user
-      const userData = {
-        id: DEMO_USER.id,
-        email: DEMO_USER.email,
-        name: DEMO_USER.name,
-        avatar: DEMO_USER.avatar,
-      }
-      setUser(userData)
-      localStorage.setItem("movieDashboardUser", JSON.stringify(userData))
-    }
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      setUser(session?.user ?? null)
+      setLoading(false)
+    })
 
-    setIsLoading(false)
-  }, [])
-
-  // Add this after the useEffect
-  useEffect(() => {
-    console.log("Auth state changed:", { user, isLoading })
-  }, [user, isLoading])
+    return () => subscription.unsubscribe()
+  }, [supabase.auth])
 
   const signIn = async (email: string, password: string) => {
-    // Simple mock authentication
-    if (email === DEMO_USER.email && password === DEMO_USER.password) {
-      const userData = {
-        id: DEMO_USER.id,
-        email: DEMO_USER.email,
-        name: DEMO_USER.name,
-        avatar: DEMO_USER.avatar,
-      }
-
-      setUser(userData)
-      localStorage.setItem("movieDashboardUser", JSON.stringify(userData))
-      return { error: null }
-    }
-
-    return { error: { message: "Invalid email or password" } }
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+    if (error) throw error
   }
 
   const signUp = async (email: string, password: string, name: string) => {
-    // For demo purposes, just create a new user with random ID
-    const userData = {
-      id: `user-${Math.random().toString(36).substring(2, 9)}`,
+    const { data, error } = await supabase.auth.signUp({
       email,
-      name,
-      avatar: `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 70)}`,
+      password,
+      options: {
+        data: {
+          name,
+        },
+      },
+    })
+    if (error) throw error
+
+    // Create user profile
+    if (data.user) {
+      const { error: profileError } = await supabase.from("users").insert({
+        id: data.user.id,
+        email,
+        name,
+      })
+      if (profileError) throw profileError
     }
-
-    setUser(userData)
-    localStorage.setItem("movieDashboardUser", JSON.stringify(userData))
-
-    return { error: null, data: { user: userData } }
   }
 
-  const signOut = () => {
-    setUser(null)
-    localStorage.removeItem("movieDashboardUser")
-    router.push("/login")
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut()
+    if (error) throw error
   }
 
   const value = {
     user,
-    isLoading,
+    loading,
     signIn,
     signUp,
     signOut,

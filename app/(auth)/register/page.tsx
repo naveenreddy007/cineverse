@@ -12,7 +12,6 @@ import { FilmIcon } from "lucide-react"
 import { motion } from "framer-motion"
 import { useToast } from "@/components/ui/use-toast"
 import { useAuth } from "@/components/auth-provider"
-import { UIFormSubmit } from "@/components/ui-form-submit"
 
 export default function RegisterPage() {
   const [name, setName] = useState("")
@@ -115,7 +114,13 @@ export default function RegisterPage() {
                 />
                 <p className="text-xs text-muted-foreground">Must be at least 8 characters long.</p>
               </div>
-              <UIFormSubmit isSubmitting={isLoading} submitText="Create Account" submittingText="Creating account..." />
+              <Button
+                type="submit"
+                className="w-full bg-neon-blue text-black hover:bg-neon-blue/80"
+                disabled={isLoading}
+              >
+                {isLoading ? "Creating account..." : "Create Account"}
+              </Button>
 
               <div className="relative my-4">
                 <div className="absolute inset-0 flex items-center">
