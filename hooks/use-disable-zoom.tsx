@@ -17,14 +17,13 @@ export function useDisableZoom() {
     }
 
     document.addEventListener("touchstart", preventDefault, { passive: false })
+    document.addEventListener("touchmove", preventDefault, { passive: false })
     document.addEventListener("wheel", preventZoom, { passive: false })
 
     return () => {
       document.removeEventListener("touchstart", preventDefault)
+      document.removeEventListener("touchmove", preventDefault)
       document.removeEventListener("wheel", preventZoom)
     }
   }, [])
 }
-
-// Default export for compatibility
-export default useDisableZoom

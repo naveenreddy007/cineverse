@@ -3,19 +3,18 @@
 import { useCallback } from "react"
 
 export function useHaptic() {
-  const triggerHaptic = useCallback((type: "light" | "medium" | "heavy" = "light") => {
-    if (typeof window !== "undefined" && "vibrate" in navigator) {
-      const patterns = {
-        light: [10],
-        medium: [20],
-        heavy: [30],
-      }
-      navigator.vibrate(patterns[type])
+  const hapticFeedback = useCallback((pattern: number | number[]) => {
+    if (typeof navigator !== "undefined" && navigator.vibrate) {
+      navigator.vibrate(pattern)
     }
   }, [])
 
-  return { triggerHaptic }
+  return {
+    light: () => hapticFeedback(10),
+    medium: () => hapticFeedback(25),
+    heavy: () => hapticFeedback(50),
+    success: () => hapticFeedback([15, 100, 30]),
+    error: () => hapticFeedback([10, 50, 50, 50, 10]),
+    hapticFeedback,
+  }
 }
-
-// Default export for compatibility
-export default useHaptic

@@ -1,10 +1,10 @@
 "use client"
 import { useEffect, useState, useRef } from "react"
-import { useMobile } from "@/hooks/use-mobile"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { useDisableZoom } from "@/hooks/use-disable-zoom"
 import { cn } from "@/lib/utils"
 import { MobileNav } from "@/components/mobile-nav"
-import { MobileFooterNav } from "@/components/mobile-footer-nav"
+import { MobileFooterNav } from "./mobile-footer-nav"
 import { MobileAppBar } from "./mobile-app-bar"
 import { ChevronUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -30,7 +30,7 @@ export function MobileLayout({
   showBack,
   onBack,
 }: MobileLayoutProps) {
-  const { isMobile, isTablet, orientation } = useMobile()
+  const isMobile = useIsMobile()
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [isScrolling, setIsScrolling] = useState(false)
   const [lastScrollY, setLastScrollY] = useState(0)
@@ -40,6 +40,10 @@ export function MobileLayout({
 
   // Disable zoom
   useDisableZoom()
+
+  if (!isMobile) {
+    return <>{children}</>
+  }
 
   // Determine if we should hide navigation on certain pages
   const isFullscreenPage = pathname?.includes("/movie/") || pathname?.includes("/watch/")
@@ -87,8 +91,6 @@ export function MobileLayout({
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
-  const shouldUseCompactLayout = isMobile || (isTablet && orientation === "portrait")
-
   return (
     <div className={cn("min-h-screen flex flex-col bg-background", className)}>
       {/* AppBar */}
@@ -110,8 +112,8 @@ export function MobileLayout({
       <main
         className={cn(
           "flex-1 w-full mx-auto transition-all duration-300",
-          shouldUseCompactLayout ? "max-w-lg px-4" : "max-w-7xl px-6",
-          !hideFooterNav && shouldUseCompactLayout ? "pb-20" : "",
+          "max-w-lg px-4",
+          !hideFooterNav ? "pb-20" : "",
           !hideTopNav && !isFullscreenPage ? "pt-16" : "",
         )}
       >
@@ -119,7 +121,7 @@ export function MobileLayout({
       </main>
 
       {/* Footer Nav */}
-      {!hideFooterNav && !isFullscreenPage && shouldUseCompactLayout && (
+      {!hideFooterNav && !isFullscreenPage && (
         <div
           className={cn(
             "fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-t border-border/40 transition-transform duration-300",
