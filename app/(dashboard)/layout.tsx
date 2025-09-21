@@ -1,10 +1,9 @@
 import type React from "react"
-import { MobileLayout } from "@/components/mobile-layout"
 
-export default function DashboardLayout({
+export default function DashboardRootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  return <MobileLayout>{children}</MobileLayout>
+  return <>{children}</>
 }

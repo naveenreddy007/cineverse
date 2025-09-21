@@ -1,17 +1,12 @@
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { createBrowserClient } from "@supabase/ssr"
 import type { Database } from "@/types/supabase"
 
-// For client-side usage
-let browserClient: ReturnType<typeof createClientComponentClient<Database>> | undefined
-
-export function getSupabaseBrowser() {
-  if (typeof window === "undefined") {
-    throw new Error("getSupabaseBrowser should only be called in the browser")
-  }
-
-  if (!browserClient) {
-    browserClient = createClientComponentClient<Database>()
-  }
-
-  return browserClient
+export function createBrowserSupabaseClient() {
+  return createBrowserClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  )
 }
+
+// Create a singleton instance for browser use
+export const supabase = createBrowserSupabaseClient()

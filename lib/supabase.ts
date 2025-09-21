@@ -1,38 +1,54 @@
 import { createClient } from "@supabase/supabase-js"
 import type { Database } from "@/types/supabase"
 import { getSupabaseBrowser } from "./supabase-browser"
-import { getSupabaseServer, getSupabaseAction } from "./supabase-server"
+import { createServerSupabaseClient } from "./supabase-server"
 
-// Create a single supabase client for the entire app
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
+// Client-side Supabase instance
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
 
+// Server-side Supabase client
+export { createServerSupabaseClient }
+
+// Re-export for compatibility
+export { createClient }
+export { getSupabaseBrowser as createBrowserClient }
+
+// Default export
+export default supabase
+
 // Helper for server-side operations with admin privileges
-export const createServerSupabaseClient = async () => {
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-  return createClient<Database>(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      persistSession: false,
-    },
-  })
-}
+// export const createServerSupabaseClient = async () => {
+//   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+//   return createClient<Database>(supabaseUrl, supabaseServiceKey, {
+//     auth: {
+//       persistSession: false,
+//     },
+//   })
+// }
+
+// Export the main client as default
+// export default supabase
+
+// Re-export for convenience
+// export { createClient }
 
 // This is a convenience function that will automatically use the correct client
 // based on whether it's being called from the client or server
-export function getSupabase() {
-  if (typeof window === "undefined") {
-    // We're on the server
-    return getSupabaseServer()
-  } else {
-    // We're on the client
-    return getSupabaseBrowser()
-  }
-}
+// export function getSupabase() {
+//   if (typeof window === "undefined") {
+//     // We're on the server
+//     return getSupabaseServer()
+//   } else {
+//     // We're on the client
+//     return getSupabaseBrowser()
+//   }
+// }
 
 // Export all functions for specific use cases
-export { getSupabaseBrowser, getSupabaseServer, getSupabaseAction }
+// export { getSupabaseBrowser, getSupabaseServer, getSupabaseAction }
 
 // Mock implementation for Supabase client - to be replaced with actual Supabase integration
 
@@ -176,4 +192,5 @@ class SupabaseClient {
 // Create a singleton instance
 const supabaseClient = new SupabaseClient()
 
-export default supabaseClient
+// Export the singleton instance for mock purposes
+export { supabaseClient }

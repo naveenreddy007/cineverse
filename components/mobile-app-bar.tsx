@@ -1,36 +1,52 @@
 "use client"
 
-import type React from "react"
-
+import { ArrowLeft, Search, MoreVertical } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, MoreVertical } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
+import { useHaptic } from "@/hooks/use-haptic"
 
-interface MobileAppBarProps {
-  title?: string
-  showBack?: boolean
-  actions?: React.ReactNode
-}
-
-export function MobileAppBar({ title, showBack = false, actions }: MobileAppBarProps) {
+export function MobileAppBar() {
   const router = useRouter()
+  const pathname = usePathname()
+  const { triggerHaptic } = useHaptic()
+
+  const getTitle = () => {
+    if (pathname.includes("/forum")) return "Community Forum"
+    if (pathname.includes("/discover")) return "Discover"
+    if (pathname.includes("/watchlist")) return "My Watchlist"
+    if (pathname.includes("/reviews")) return "Reviews"
+    if (pathname.includes("/streaming")) return "Streaming"
+    if (pathname.includes("/community")) return "Community"
+    return "SidduVerse"
+  }
+
+  const showBackButton = pathname !== "/dashboard"
+
+  const handleBack = () => {
+    triggerHaptic("light")
+    router.back()
+  }
 
   return (
-    <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border/40">
+    <div className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border/50">
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-3">
-          {showBack && (
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => router.back()}>
-              <ArrowLeft className="h-4 w-4" />
+          {showBackButton && (
+            <Button variant="ghost" size="sm" onClick={handleBack} className="p-2">
+              <ArrowLeft className="h-5 w-5" />
             </Button>
           )}
-          {title && <h1 className="text-lg font-semibold truncate">{title}</h1>}
+          <h1 className="text-lg font-semibold">{getTitle()}</h1>
         </div>
-        {actions || (
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <MoreVertical className="h-4 w-4" />
+
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" className="p-2">
+            <Search className="h-5 w-5" />
           </Button>
-        )}
+          <Button variant="ghost" size="sm" className="p-2">
+            <MoreVertical className="h-5 w-5" />
+          </Button>
+        </div>
       </div>
     </div>
   )
